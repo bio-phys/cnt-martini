@@ -3,6 +3,8 @@
 Generates a Martini model for an open carbon nanotube (CNT) for use with the Gromacs simulation package.
 It provides a structure file (.gro), a topology-include file (.itp) and a position-restraints file (.itp).
 
+Tools to analyze Martini CNT simulations can be found here: https://github.com/bio-phys/cnt-martini-analysis. 
+
 # Requirements
 
 Python 2.7 with packages math and sys
