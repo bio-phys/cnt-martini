@@ -211,7 +211,7 @@ for m in xrange(1, numrings-1):
 
 topology_file.write( "\n; Include Position restraint file\n" )
 topology_file.write( "#ifdef POSRES\n" )
-topology_file.write( "#include \"tube-%d-%d-f%d%d-%s-posres.itp\"\n" % (numrings, ringsize, numfuncb, numfunce, functype) )
+topology_file.write( "#include \"cnt-%d-%d-f%d%d-%s-posres.itp\"\n" % (numrings, ringsize, numfuncb, numfunce, functype) )
 topology_file.write( "#endif\n" )
 
 topology_file.close()
