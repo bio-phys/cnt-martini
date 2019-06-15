@@ -3,37 +3,44 @@
 import sys
 import math
 from math import *
+import argparse
 
 
+# Argument Parser
+parser = argparse.ArgumentParser()
+parser.add_argument( "-nr", "--numrings",   type=int,   default=12,     help='Number of rings (~height)'                           )
+parser.add_argument( "-rs", "--ringsize",   type=int,   default=8,      help='Number of beads per ring (~circumference)'           )
+parser.add_argument( "-bl", "--bondlength", type=float, default=0.47,   help='Length of one bond'                                  )
+parser.add_argument( "-bt", "--beadtype",   type=str,   default='CNP',  help='Type of the regular beads'                           )
+parser.add_argument( "-ft", "--functype",   type=str,   default='SNda', help='Type of the functionalization beads'                 )
+parser.add_argument( "-fb", "--numfuncb",   type=int,   default=1,      help='Number of funct. bead rings at the beginning'        )
+parser.add_argument( "-fe", "--numfunce",   type=int,   default=1,      help='Number of funct. bead rings at the end'              )
+parser.add_argument( "-fn", "--filename",   type=str,   default=None,   help='Name of the output, default: generate automatically' )
+args = parser.parse_args()
 
-# Variables
 
-numrings = int(sys.argv[1])    # Number of rings of beads ( ~ height)
-ringsize = int(sys.argv[2])    # Number of beads per ring ( ~ circumference )
-numfuncb = int(sys.argv[3])    # Number of different-bead rings at the beginning
-numfunce = int(sys.argv[4])    # Number of different-bead rings at the end
-if len(sys.argv)>5:
-	functype = sys.argv[5] # Type of different bead
+numrings = args.numrings
+ringsize = args.ringsize
+a 	 = args.bondlength
+beadtype = args.beadtype
+functype = args.functype
+numfuncb = args.numfuncb
+numfunce = args.numfunce
+
+if args.filename == None:
+	filename = "cnt-"+str(numrings)+"-"+str(ringsize)+"-a"+"%3i"%(1000*a)+"-"+beadtype+"-f"+str(numfuncb)+str(numfunce)+"-"+functype
+
+numatoms = numrings*ringsize
+alpha 	 = 2*math.pi/ringsize
+R 	 = a/(2*sin(alpha/2))
+
 
 print( "------------------------------------------------------------------------------" )
 print( "Generating a Martini model for an open CNT using "+str(numrings)+" rings with "+str(ringsize)+" each." )
 print( "------------------------------------------------------------------------------" )
 
-numatoms = numrings*ringsize
-a 	 = 0.47
-alpha 	 = 2*math.pi/ringsize
-R 	 = a/(2*sin(alpha/2))
 
-
-if numfuncb+numfunce > 0:
-	if len(sys.argv)<=5:
-		print( "ERROR: You seemt o want fuctional groups but did not specify a bead type!" )
-		sys.exit()
-	else:
-		print( "The "+str(numfuncb)+" first and the "+str(numfunce)+" last rings will be of type "+functype+"." )
-		filename = "cnt-"+str(numrings)+"-"+str(ringsize)+"-f"+str(numfuncb)+str(numfunce)+"-"+functype
-else:
-	filename = "cnt-"+str(numrings)+"-"+str(ringsize)+"-f"+str(numfuncb)+str(numfunce)
+print( "The "+str(numfuncb)+" first and the "+str(numfunce)+" last rings will be of type "+functype+"." )
 
 
 #----------------#
@@ -122,7 +129,7 @@ for m in range(0, numrings):
 		if ( m < numfuncb or m >= numrings-numfunce):
 			topology_file.write( "%3d    %4s   1   CNT    F%03d     %3d       0      48\n" % (i, functype, i, i) )
 		else:
-			topology_file.write( "%3d     CNP   1   CNT    C%03d     %3d       0      48\n" % (i, i, i) )
+			topology_file.write( "%3d    %4s   1   CNT    C%03d     %3d       0      48\n" % (i, beadtype, i, i) )
 
 
 # Bonds
@@ -136,7 +143,7 @@ for m in range(1, numrings+1):
 	for n in range(1, ringsize+1):
 		i = (m-1)*ringsize + n
 		j = (m-1)*ringsize + n%ringsize + 1
-		topology_file.write( "     %3d     %3d       1   0.470    5000\n" % (i, j) )
+		topology_file.write( "     %3d     %3d       1   %4.3f    5000\n" % (i, j, a) )
 
 
 topology_file.write( "; between rings, short\n" )
@@ -147,22 +154,22 @@ for m in range(1, numrings):
 		if m%2 == 1: 	
 			i = (m-1)*ringsize + n
 			j = m*ringsize + n
-			topology_file.write( "     %3d     %3d       1   0.470    5000\n" % (i, j) )
+			topology_file.write( "     %3d     %3d       1   %4.3f    5000\n" % (i, j, a) )
 			if i%ringsize == 1: 
 				k = (m+1)*ringsize
 			else:
 				k = m*ringsize + n-1
-			topology_file.write( "     %3d     %3d       1   0.470    5000\n" % (i, k) )
+			topology_file.write( "     %3d     %3d       1   %4.3f    5000\n" % (i, k, a) )
 		# even-numbered rings
 		else: 		
 			i = (m-1)*ringsize + n
 			j = m*ringsize + n
-			topology_file.write( "     %3d     %3d       1   0.470    5000\n" % (i, j) )
+			topology_file.write( "     %3d     %3d       1   %4.3f    5000\n" % (i, j, a) )
 			if i%ringsize == 0: 
 				k = i+1
 			else:
 				k = j+1
-			topology_file.write( "     %3d     %3d       1   0.470    5000\n" % (i, k) )
+			topology_file.write( "     %3d     %3d       1   %4.3f    5000\n" % (i, k, a) )
 
 
 # Angles
