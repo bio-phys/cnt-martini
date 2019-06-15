@@ -7,7 +7,7 @@ Tools to analyze Martini CNT simulations can be found here: https://github.com/b
 
 # Requirements
 
-Python 2.7 with packages math and sys
+Python (2 or 3) with packages math and sys
 
 # Usage
 
