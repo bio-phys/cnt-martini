@@ -13,11 +13,11 @@ Python (2/3) with packages argparse, math, and sys
 
 For a new nanotube model, run 
 
-    python martini-cnt-generator.py -nr [number of rings] -rs [number of beads per ring] -bl [bond length] -bt [bead type] -ft [bead type of the functional groups] -nb [number of functionalized rings at one end] -ne [number of functionalized rings at the other end]
+    python martini-cnt-generator.py -nr [number of rings] -rs [number of beads per ring] -bl [bond length] -bt [bead type] -ft [bead type of the functional groups] -fb [number of functionalized rings at one end] -fe [number of functionalized rings at the other end]
 
 for example
 
-    python martini-cnt-generator.py -nr 12 -rs 8 -bl 0.47 -bt CNP -ft SNda -nb 1 -ne 1
+    python martini-cnt-generator.py -nr 12 -rs 8 -bl 0.47 -bt CNP -ft SNda -fb 1 -fe 1
 
 All arguments are optional. If an argument is not used, the default value for the standard CNT porin [1] is used.
 
