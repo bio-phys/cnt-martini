@@ -29,7 +29,9 @@ numfunce = args.numfunce
 
 if args.filename == None:
 	filename = "cnt-"+str(numrings)+"-"+str(ringsize)+"-a"+"%3i"%(1000*a)+"-"+beadtype+"-f"+str(numfuncb)+str(numfunce)+"-"+functype
-
+else
+        filename = args.filename
+	
 numatoms = numrings*ringsize
 alpha 	 = 2*math.pi/ringsize
 R 	 = a/(2*sin(alpha/2))
