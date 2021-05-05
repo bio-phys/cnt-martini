@@ -26,7 +26,7 @@ All arguments are optional. If an argument is not used, the default value for th
 If the script or the model is helpful, please cite:
 - [1]  M. Vögele, J. Köfinger, G. Hummer: 
     Simulations of Carbon Nanotube Porins in Lipid Bilayers.
-    Faraday Discuss., 2018, Accepted Manuscript, DOI: 10.1039/C8FD00011E  
+    Faraday Discuss., 2018, 209, 341-358, DOI: 10.1039/C8FD00011E  
     http://pubs.rsc.org/en/content/articlelanding/2018/fd/c8fd00011e
 
 The model is based on previous work:
