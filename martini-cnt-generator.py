@@ -74,9 +74,9 @@ for i in range(0, numrings):
 		y = R*cos(p)
 		z = i*a*sqrt(3)/2
 		if ( i < numfuncb or i >= numrings-numfunce):
-			structure_file.write(  "%5d%-5s F%03d%5d%8.3f%8.3f%8.3f%8.4f%8.4f%8.4f\n" % (1, "  CNT", n, n, x, y, z, 0, 0, 0) )
+			structure_file.write(  "%5d%-5s F%03d%5d%8.3f%8.3f%8.3f%8.4f%8.4f%8.4f\n" % (1, "  CNT", n%1000, n%100000, x, y, z, 0, 0, 0) )
 		else:
-			structure_file.write(  "%5d%-5s C%03d%5d%8.3f%8.3f%8.3f%8.4f%8.4f%8.4f\n" % (1, "  CNT", n, n, x, y, z, 0, 0, 0) )
+			structure_file.write(  "%5d%-5s C%03d%5d%8.3f%8.3f%8.3f%8.4f%8.4f%8.4f\n" % (1, "  CNT", n%1000, n%100000, x, y, z, 0, 0, 0) )
 
 
 # Box Dimensions
