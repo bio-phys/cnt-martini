@@ -129,9 +129,9 @@ for m in range(0, numrings):
 	for n in range(1, ringsize+1):
 		i = m*ringsize + n
 		if ( m < numfuncb or m >= numrings-numfunce):
-			topology_file.write( "%3d    %4s   1   CNT    F%03d     %3d       0      48\n" % (i, functype, i, i) )
+			topology_file.write( "%3d    %4s   1   CNT    F%03d     %3d       0      48\n" % (i, functype, i%1000, i%1000) )
 		else:
-			topology_file.write( "%3d    %4s   1   CNT    C%03d     %3d       0      48\n" % (i, beadtype, i, i) )
+			topology_file.write( "%3d    %4s   1   CNT    C%03d     %3d       0      48\n" % (i, beadtype, i%1000, i%1000) )
 
 
 # Bonds
