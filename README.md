@@ -5,11 +5,11 @@ It provides a structure file (.gro), a topology-include file (.itp) and a positi
 
 Tools to analyze Martini CNT simulations can be found here: https://github.com/bio-phys/cnt-martini-analysis. 
 
-# Requirements
+## Requirements
 
 Python (2/3) with packages argparse, math, and sys
 
-# Usage
+## Usage
 
 For a new nanotube model, run 
 
@@ -21,7 +21,11 @@ for example
 
 All arguments are optional. If an argument is not used, the default value for the standard CNT porin [1] is used.
 
-# Literature
+## Notes
+
+* For large CNTs, a higher force constant than the standard value of 5000 should be used. A rule of thumb is to use a value of 20000 if the circumference exceeds 10 beads/ring or the length exceeds 15 rings. 
+
+## Literature
 
 If the script or the model is helpful, please cite:
 - [1]  M. Vögele, J. Köfinger, G. Hummer: 
