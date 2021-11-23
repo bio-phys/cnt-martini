@@ -6,6 +6,7 @@ HEIGHT=10
 mkdir -p run
 cd run
 
+cp ../parameters/* .
 cp ../../cnt-12-8-a470-CNP-f11-SNda.gro cnt.gro
 cp ../../cnt-12-8-a470-CNP-f11-SNda.itp cnt.itp
 
