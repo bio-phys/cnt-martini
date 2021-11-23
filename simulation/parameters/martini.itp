@@ -1,0 +1,16 @@
+;
+; Template Topology File 
+
+; Include topology files for ...
+
+; particle definitions, interaction matrix, plus the topology for water.
+#include "../martini/martini_v2.1_CNP_PEG_PS.itp"
+
+; ions
+#include "../martini/martini_v2.0_ions.itp"
+
+; lipids
+#include "../martini/martini_v2.0_lipids_all_201506.itp"
+
+; carbon nanotube 
+#include "cnt.itp"

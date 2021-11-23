@@ -13,7 +13,7 @@ Python (2/3) with packages argparse, math, and sys
 
 For a new nanotube model, run 
 
-    python martini-cnt-generator.py -nr [number of rings] -rs [number of beads per ring] -bl [bond length] -bt [bead type] -ft [bead type of the functional groups] -fb [number of functionalized rings at one end] -fe [number of functionalized rings at the other end]
+    python martini-cnt-generator.py -nr [number of rings] -rs [number of beads per ring] -bl [bond length] -bf [bond force const.] -af [angle force const.] -bt [bead type] -ft [bead type of the functional groups] -fb [number of functionalized rings at one end] -fe [number of functionalized rings at the other end]
 
 for example
 
@@ -24,6 +24,7 @@ All arguments are optional. If an argument is not used, the default value for th
 ## Notes
 
 * For large CNTs, a higher force constant than the standard value of 5000 should be used. A rule of thumb is to use a value of 20000 if the circumference exceeds 10 beads/ring or the length exceeds 15 rings. 
+* The script produces position restraints, too. These are usually inteded for equilibration. They will not work with a Parrinello-Rahman barostat. 
 
 ## Literature
 

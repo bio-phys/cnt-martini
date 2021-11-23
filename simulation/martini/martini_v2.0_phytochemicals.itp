@@ -1,0 +1,357 @@
+;;;;;; Phytochemicals, compatible with Martini v2.x
+;
+; Last modified: 12-jun-2014
+;
+;
+; These topologies are from:
+;   H.I. Ingolfsson, P. Thakur, K.F. Herold, E.A. Hobart, N.B. Ramsey, X. Periole, D.H. de Jong, M. Zwama, D. Yilmaz, 
+;   K. Hall, T. Maretzky, H.C. Hemmings, C. Blobel, S.J. Marrink, A. Kocer, J.T. Sack, O.S. Andersen. 
+;   Phytochemicals perturb membranes and promiscuously alter protein function. 
+;   ACS Chem. Biol., 9:1788-1798, 2014. DOI:10.1021/cb500086e.
+;
+; WARNING_1: 
+;   Please note, the phytochemicals force fields were parameterized primarily based on atomistic force fields generated
+;   using an automatic topology builder with little manual curation. The phytochemicals force fields are meant to provide 
+;   an overall indication of the molecules affect on bilayer properties and not for detailed studies on their nature.
+;
+; WARNING_2: 
+;   The CG epigallocatechin gallate (EGCG, Name -> EGCGCG) localizes higher in the bilayer than it's atomistic counterpart. 
+;   We therefore also include an alternative EGCG model (Name -> EGCGN0), this model resides lower in the bilayer than EGCGCG
+;   but still higher than the atomistic model. Neither model has been experimentally verified and should be used with caution. 
+;
+;
+; currently available:
+;    capsaicin, curcumin, epigallocatechin gallate (EGCG), genistein, resveratrol
+; 
+;;;;;; 
+
+
+;;;;;;
+;;;;;; capsaicin
+;;;;;;
+
+[ moleculetype ]
+; Name   nrexcl
+CAPCG     1
+
+[ atoms ]
+;  nr  type  resnr  resid  atom  cgnr  charge    mass    total_charge
+    1   C3   1      CAPCG   PA1   1     0     72
+    2   C1   1      CAPCG   PA2   2     0     72
+    3   P5   1      CAPCG   PA3   3     0     72
+    4   C4   1      CAPCG   PA4   4     0     72
+    5  SNa   1      CAPCG   PA5   5     0     72
+    6  SP1   1      CAPCG   PA6   6     0     72
+
+[ bonds ]
+;  ai   aj  funct   c0         c1
+1 2  1 0.420 1250
+2 3  1 0.400 1250 
+3 4  1 0.355 1250
+4 5  1 0.324 6000
+5 6  1 0.356 4500
+4 6  1 0.286 3000
+
+[ angles ]
+;  ai   aj   ak  funct   angle     fc
+1 2 3 1 135 15.0
+2 3 4 1 125 15.0 
+3 4 5 1 130 15.0
+3 4 6 1 142 30.0
+
+;[ dihedrals ]
+;  ai   aj   ak   al  funct   angle     fc
+
+
+;;;;;;
+;;;;;; curcumin
+;;;;;;
+
+[ moleculetype ]
+; Name   nrexcl
+CURCG     1
+
+[ atoms ]
+;  nr  type  resnr  resid  atom  cgnr  charge    mass    total_charge
+    1  SNa   1      CURCG   PA1   1     0     72
+    2  SP1   1      CURCG   PA2   2     0     72
+    3  SC4   1      CURCG   PA3   3     0     72
+    4  SNa   1      CURCG   PA4   4     0     72
+    5  SNa   1      CURCG   PA5   5     0     72
+    6  SC4   1      CURCG   PA6   6     0     72
+    7  SP1   1      CURCG   PA7   6     0     72
+    8  SNa   1      CURCG   PA8   6     0     72
+
+[ bonds ]
+;  ai   aj  funct   c0         c1
+1 2 1 0.290 30000
+1 3 1 0.322 50000
+3 4 1 0.350 50000
+4 5 1 0.385  5000
+5 6 1 0.350 50000
+7 8 1 0.290 50000
+6 8 1 0.322 40000
+
+[ constraints ]
+2 3 1 0.275 
+6 7 1 0.275 
+
+[ angles ]
+;  ai   aj   ak  funct   angle     fc
+1 3 4 1 140 150.0
+2 3 4 1 170 150.0
+3 4 5 1 140 20.0
+4 5 6 1 140 20.0
+5 6 7 1 170 150.0
+5 6 8 1 140 150.0
+
+;[ dihedrals ]
+;  ai   aj   ak   al  funct   angle     fc
+
+
+;;;;;;
+;;;;;; epigallocatechin gallate (EGCG)
+;;;;;;  
+;;;;;; Warning, localizes higher in the bilayer than it's atomistic counterpart
+;;;;;;  
+
+[ moleculetype ]
+; Name   nrexcl
+EGCGCG     1
+
+[ atoms ]
+;  nr  type  resnr  resid  atom  cgnr  charge    mass    total_charge
+    1  SP3   1      EGCGCG   PA1   1     0     72
+    2  SP3   1      EGCGCG   PA2   2     0     72
+    3  SC4   1      EGCGCG   PA3   3     0     72
+    4  SNa   1      EGCGCG   PA4   4     0     72
+    5  SP3   1      EGCGCG   PA5   5     0     72
+    6  SP3   1      EGCGCG   PA6   6     0     72
+    7  SC4   1      EGCGCG   PA7   7     0     72
+    8  SC2   1      EGCGCG   PA8   8     0     72
+    9  SNa   1      EGCGCG   PA9   9     0     72
+   10  SP1   1      EGCGCG   PA10 10     0     72
+   11  SP1   1      EGCGCG   PA11 11     0     72
+
+[ bonds ]
+;  ai   aj  funct   c0         c1
+  4  8  1 0.290  20000
+  8 10  1 0.260  40000
+  8 11  1 0.435  40000
+  9 10  1 0.350  40000
+
+[ constraints ]
+;  ai   aj  funct   c0         c1
+  1  2  1 0.199
+  2  3  1 0.237
+  1  3  1 0.239
+  3  4  1 0.239
+  8  9  1 0.195  
+  9 11  1 0.371
+ 10 11  1 0.298
+  9  7  1 0.285
+  7  6  1 0.236
+  6  5  1 0.203
+  5  7  1 0.236
+
+[ angles ]
+;  ai   aj   ak  funct   angle     fc
+ 1 3 4   1  154.0 120.0
+ 2 3 4   1  155.0 120.0
+ 3 4 8   1  130.0  75.0
+ 4 8 10  1  133.0  50.0
+ 4 8 9   1  102.0  60.0
+ 7 9 11  1  155.0 120.0
+ 7 9 8   1  106.0 150.0
+ 5 7 9   1  150.0  60.0
+ 6 7 9   1  150.0  60.0
+ 8 9 5   1  112.0  40.0
+ 8 9 6   1  147.0  40.0
+
+[ exclusions ] 
+; these exclusion where introduced to make the angles obey!
+1 4
+2 4
+4 5 6 7 9 10 11
+5 8 9
+6 8 9
+7 8 11 
+
+[ dihedrals ]
+;  ai   aj   ak   al  funct   angle     fc
+4 8 9 7   2   -30.0  50.0
+5 6 9 8   1    40.0   5.0    2
+1 2 8 9   1   -85.0   3.0    2
+;4 8 10 11 2  -106.0  50.0 ; remove to improve stability
+3 8 9 7   2   -51.0  50.0
+
+
+;;;;;;
+;;;;;; Alternative, epigallocatechin gallate (EGCG) model
+;;;;;;  
+;;;;;; Warning, resides lower in the bilayer than EGCGCG but still higher than the atomistic model
+;;;;;;  
+
+[ moleculetype ]
+; Name   nrexcl
+EGCGN0     1
+
+[ atoms ]
+;  nr  type  resnr  resid  atom  cgnr  charge    mass    total_charge
+    1  SN0   1      EGCGN0   PA1   1     0     72
+    2  SN0   1      EGCGN0   PA2   2     0     72
+    3  SC4   1      EGCGN0   PA3   3     0     72
+    4  SNa   1      EGCGN0   PA4   4     0     72
+    5  SN0   1      EGCGN0   PA5   5     0     72
+    6  SN0   1      EGCGN0   PA6   6     0     72
+    7  SC4   1      EGCGN0   PA7   7     0     72
+    8  SC2   1      EGCGN0   PA8   8     0     72
+    9  SNa   1      EGCGN0   PA9   9     0     72
+   10  SP1   1      EGCGN0   PA10 10     0     72
+   11  SP1   1      EGCGN0   PA11 11     0     72
+
+[ bonds ]
+;  ai   aj  funct   c0         c1
+  4  8  1 0.290  20000
+  8 10  1 0.260  40000
+  8 11  1 0.435  40000
+  9 10  1 0.350  40000
+
+[ constraints ]
+;  ai   aj  funct   c0         c1
+  1  2  1 0.199
+  2  3  1 0.237
+  1  3  1 0.239
+  3  4  1 0.239
+  8  9  1 0.195  
+  9 11  1 0.371
+ 10 11  1 0.298
+  9  7  1 0.285
+  7  6  1 0.236
+  6  5  1 0.203
+  5  7  1 0.236
+
+[ angles ]
+;  ai   aj   ak  funct   angle     fc
+ 1 3 4   1  154.0 120.0
+ 2 3 4   1  155.0 120.0
+ 3 4 8   1  130.0  75.0
+ 4 8 10  1  133.0  50.0
+ 4 8 9   1  102.0  60.0
+ 7 9 11  1  155.0 120.0
+ 7 9 8   1  106.0 150.0
+ 5 7 9   1  150.0  60.0
+ 6 7 9   1  150.0  60.0
+ 8 9 5   1  112.0  40.0
+ 8 9 6   1  147.0  40.0
+
+[ exclusions ] 
+; these exclusion where introduced to make the angles obey!
+1 4
+2 4
+4 5 6 7 9 10 11
+5 8 9
+6 8 9
+7 8 11 
+
+[ dihedrals ]
+;  ai   aj   ak   al  funct   angle     fc
+4 8 9 7   2   -30.0  50.0
+5 6 9 8   1    40.0   5.0    2
+1 2 8 9   1   -85.0   3.0    2
+;4 8 10 11 2  -106.0  50.0 ; remove to improve stability
+3 8 9 7   2   -51.0  50.0
+
+
+;;;;;;
+;;;;;; genistein
+;;;;;;
+
+[ moleculetype ]
+; Name   nrexcl
+GENCG     1
+
+[ atoms ]
+;  nr  type  resnr  resid  atom  cgnr  charge    mass    total_charge
+    1  SP1   1      GENCG   PA1   1     0     72
+    2  SC4   1      GENCG   PA2   2     0     72
+    3  SC4   1      GENCG   PA3   3     0     72
+    4  SNa   1      GENCG   PA4   4     0     72
+    5  SNa   1      GENCG   PA5   5     0     72
+    6  SP1   1      GENCG   PA6   6     0     72
+    7  SP1   1      GENCG   PA7   6     0     72
+
+[ bonds ]
+;  ai   aj  funct   c0         c1
+2 4  1 0.311 10000
+3 5  1 0.441 20000
+3 4  1 0.311 10000
+2 5  1 0.441 20000
+4 6  1 0.506 40000
+
+[ constraints ]
+1 2  1 0.210 
+2 3  1 0.161 
+1 3  1 0.209 
+4 5  1 0.267 
+5 6  1 0.365 
+6 7  1 0.298 
+4 7  1 0.295 
+5 7  1 0.344 
+
+;[ angles ]
+;;  ai   aj   ak  funct   angle     fc
+
+[ dihedrals ]
+;  ai   aj   ak   al  funct   angle     fc
+ 3 2 4 5  2   -92.5  7.0   
+ 1 2 3 4  2   155.0 15.0
+ 1 3 2 5  2   170.5 15.0
+ 2 4 5 6  2  -165.0 15.0
+ 3 5 4 7  2  -165.5 15.0
+
+
+;;;;;;
+;;;;;; resveratrol
+;;;;;;
+
+[ moleculetype ]
+; Name   nrexcl
+RESCG     1
+
+[ atoms ]
+;  nr  type  resnr  resid  atom  cgnr  charge    mass    total_charge
+    1  SP1   1      RESCG   PA1   1     0     72
+    2  SP1   1      RESCG   PA2   2     0     72
+    3  SC4   1      RESCG   PA3   3     0     72
+    4  SC4   1      RESCG   PA4   4     0     72
+    5  SC4   1      RESCG   PA5   5     0     72
+    6  SC4   1      RESCG   PA6   6     0     72
+    7  SP1   1      RESCG   PA7   6     0     72
+
+[ bonds ]
+;  ai   aj  funct   c0         c1
+4 5  1 0.300 40000
+4 6  1 0.300 40000
+
+[ constraints ]
+1 2  1 0.260 
+2 3  1 0.212 
+1 3  1 0.212 
+3 4  1 0.243 
+5 6  1 0.160 
+6 7  1 0.210 
+5 7  1 0.210 
+
+[ angles ]
+;  ai   aj   ak  funct   angle     fc
+1 3 4 1 180 20.0
+2 3 4 1 180 20.0 
+3 4 5 1 165 100.0
+3 4 6 1 165 100.0
+3 4 7 1 172 100.0
+
+[ dihedrals ]
+;  ai   aj   ak   al  funct   angle     fc
+ 1 2 6 5  1    180.0   7.0        2
+

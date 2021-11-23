@@ -11,6 +11,8 @@ parser = argparse.ArgumentParser()
 parser.add_argument( "-nr", "--numrings",   type=int,   default=12,     help='Number of rings (~height)'                           )
 parser.add_argument( "-rs", "--ringsize",   type=int,   default=8,      help='Number of beads per ring (~circumference)'           )
 parser.add_argument( "-bl", "--bondlength", type=float, default=0.47,   help='Length of one bond'                                  )
+parser.add_argument( "-bf", "--bondforce",  type=float, default=5000,   help='Force constant for one bond'                         )
+parser.add_argument( "-af", "--angleforce", type=float, default=350,    help='Force constant for one bond'                         )
 parser.add_argument( "-bt", "--beadtype",   type=str,   default='CNP',  help='Type of the regular beads'                           )
 parser.add_argument( "-ft", "--functype",   type=str,   default='SNda', help='Type of the functionalization beads'                 )
 parser.add_argument( "-fb", "--numfuncb",   type=int,   default=1,      help='Number of funct. bead rings at the beginning'        )
@@ -21,11 +23,14 @@ args = parser.parse_args()
 
 numrings = args.numrings
 ringsize = args.ringsize
-a 	 = args.bondlength
 beadtype = args.beadtype
 functype = args.functype
 numfuncb = args.numfuncb
 numfunce = args.numfunce
+a        = args.bondlength
+kf_bonds = args.bondforce
+kf_angle = args.angleforce
+
 
 if args.filename == None:
 	filename = "cnt-"+str(numrings)+"-"+str(ringsize)+"-a"+"%3i"%(1000*a)+"-"+beadtype+"-f"+str(numfuncb)+str(numfunce)+"-"+functype
@@ -145,7 +150,7 @@ for m in range(1, numrings+1):
 	for n in range(1, ringsize+1):
 		i = (m-1)*ringsize + n
 		j = (m-1)*ringsize + n%ringsize + 1
-		topology_file.write( "     %3d     %3d       1   %4.3f    5000\n" % (i, j, a) )
+		topology_file.write( "     %3d     %3d       1   %4.3f    %5.1f\n" % (i, j, a, kf_bonds) )
 
 
 topology_file.write( "; between rings, short\n" )
@@ -156,22 +161,22 @@ for m in range(1, numrings):
 		if m%2 == 1: 	
 			i = (m-1)*ringsize + n
 			j = m*ringsize + n
-			topology_file.write( "     %3d     %3d       1   %4.3f    5000\n" % (i, j, a) )
+			topology_file.write( "     %3d     %3d       1   %4.3f    %5.1f\n" % (i, j, a, kf_bonds) )
 			if i%ringsize == 1: 
 				k = (m+1)*ringsize
 			else:
 				k = m*ringsize + n-1
-			topology_file.write( "     %3d     %3d       1   %4.3f    5000\n" % (i, k, a) )
+			topology_file.write( "     %3d     %3d       1   %4.3f    %5.1f\n" % (i, k, a, kf_bonds) )
 		# even-numbered rings
 		else: 		
 			i = (m-1)*ringsize + n
 			j = m*ringsize + n
-			topology_file.write( "     %3d     %3d       1   %4.3f    5000\n" % (i, j, a) )
+			topology_file.write( "     %3d     %3d       1   %4.3f    %5.1f\n" % (i, j, a, kf_bonds) )
 			if i%ringsize == 0: 
 				k = i+1
 			else:
 				k = j+1
-			topology_file.write( "     %3d     %3d       1   %4.3f    5000\n" % (i, k, a) )
+			topology_file.write( "     %3d     %3d       1   %4.3f    %5.1f\n" % (i, k, a, kf_bonds) )
 
 
 # Angles
@@ -186,7 +191,7 @@ for m in range(1, numrings+1):
 		i = (m-1)*ringsize + n
 		j = (m-1)*ringsize + n%ringsize + 1
 		k = (m-1)*ringsize + (n+1)%ringsize + 1
-		topology_file.write( "     %3d     %3d     %3d       2     %3.3f     350\n" % (i, j, k, alpha) )
+		topology_file.write( "     %3d     %3d     %3d       2     %3.3f     %5.1f\n" % (i, j, k, alpha, kf_angle) )
 
 
 # Improper Dihedrals
@@ -206,14 +211,14 @@ for m in range(1, numrings-1):
 				k = (m+1)*ringsize
 			else:
 				k = m*ringsize + (n-1)
-			topology_file.write( "     %3d     %3d     %3d     %3d       2        %3.3f      350\n" % (i,k,j,l,beta) )
+			topology_file.write( "     %3d     %3d     %3d     %3d       2        %3.3f      %5.1f\n" % (i,k,j,l,beta, kf_angle) )
 		# even-numbered rings
 		else:
 			if i%ringsize == 0: 
 				k = i+1
 			else:
 				k = j+1
-			topology_file.write( "     %3d     %3d     %3d     %3d       2        %3.3f      350\n" % (i,j,k,l,beta) )
+			topology_file.write( "     %3d     %3d     %3d     %3d       2        %3.3f      %5.1f\n" % (i,j,k,l,beta, kf_angle) )
 
 
 # Restraints
