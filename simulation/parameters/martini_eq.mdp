@@ -1,77 +1,47 @@
 ;
-; STANDARD MD INPUT OPTIONS FOR MARTINI 2.x
-; Updated 02 feb 2013 by DdJ
+; MD EQUILIBRATION INPUT OPTIONS FOR CNT SIMULATIONS WITH MARTINI 2.x
 ;
-; for use with GROMACS 4.5/4.6
-;
+; for use with GROMACS 5
+; For a thorough comparison of different mdp options in combination with the Martini force field, see:
+; D.H. de Jong et al., Martini straight: boosting performance using a shorter cutoff and GPUs, submitted.
 
 title                    = Martini
 
-define		         = -DPOS_Z_AXES	; position restrain "X lipids" in z direction
-
-
 ; TIMESTEP IN MARTINI 
-; Most simulations are numerically stable 
-; with dt=40 fs, some (especially rings and polarizable water) require 20-30 fs.
-; Note that time steps of 40 fs and larger may create local heating or 
-; cooling in your system. Although the use of a heat bath will globally 
-; remove this effect, it is advised to check consistency of 
-; your results for somewhat smaller time steps in the range 20-30 fs.
-; Time steps exceeding 40 fs should not be used; time steps smaller
-; than 20 fs are also not required unless specifically stated in the itp file.
-
+; Most simulations are numerically stable with dt=40 fs, 
+; however better energy conservation is achieved using a 
+; 20-30 fs timestep. 
+; Time steps smaller than 20 fs are not required unless specifically stated in the itp file.
 
 integrator               = md
 dt                       = 0.02  
-nsteps                   = 2500000
+nsteps                   = 50000
 nstcomm                  = 100
 comm-grps		 = 
-
-
-; OUTPUT CONTROL OPTIONS = 
-; Output frequency for coords (x), velocities (v) and forces (f) = 
 
 nstxout                  = 0
 nstvout                  = 0
 nstfout                  = 0
-nstlog                   = 1000  ; Output frequency for energies to log file 
-nstenergy                = 100   ; Output frequency for energies to energy file
-nstxtcout                = 1000  ; Output frequency for .xtc file
-xtc_precision            = 100
-xtc-grps                 = 
-energygrps               = System
-
-
+nstlog                   = 1000
+nstenergy                = 100
+nstxout-compressed       = 1000
+compressed-x-precision   = 100
+compressed-x-grps        = 
+energygrps               = Membrane Water 
 
 ; NEIGHBOURLIST and MARTINI 
-; Due to the use of shifted potentials, the noise generated 
-; from particles leaving/entering the neighbour list is not so large, 
-; even when large time steps are being used. In practice, once every 
-; ten steps works fine with a neighborlist cutoff that is equal to the 
-; non-bonded cutoff (1.2 nm). However, to improve energy conservation 
-; or to avoid local heating/cooling, you may increase the update frequency 
-; and/or enlarge the neighbourlist cut-off (to 1.4 nm). The latter option 
-; is computationally less expensive and leads to improved energy conservation
-
-nstlist                  = 10
-ns_type                  = grid
-pbc                      = xyz
-rlist                    = 1.4
-
-periodic_molecules 	 = yes
-
-
-
-; MARTINI and NONBONDED 
-; Standard cut-off schemes are used for the non-bonded interactions 
-; in the Martini model: LJ interactions are shifted to zero in the 
-; range 0.9-1.2 nm, and electrostatic interactions in the range 0.0-1.2 nm. 
-; The treatment of the non-bonded cut-offs is considered to be part of 
-; the force field parameterization, so we recommend not to touch these 
-; values as they will alter the overall balance of the force field.
-; In principle you can include long range electrostatics through the use
-; of PME, which could be more realistic in certain applications 
-; Please realize that electrostatic interactions in the Martini model are 
+; To achieve faster simulations in combination with the Verlet-neighborlist
+; scheme, Martini can be simulated with a straight cutoff. In order to 
+; do so, the cutoff distance is reduced 1.1 nm. 
+; Neighborlist length should be optimized depending on your hardware setup:
+; updating ever 20 steps should be fine for classic systems, while updating
+; every 30-40 steps might be better for GPU based systems.
+; The Verlet neighborlist scheme will automatically choose a proper neighborlist
+; length, based on a energy drift tolerance.
+;
+; Coulomb interactions can alternatively be treated using a reaction-field,
+; giving slightly better properties.
+; Please realize that electrostVatic interactions in the Martini model are 
 ; not considered to be very accurate to begin with, especially as the 
 ; screening in the system is set to be uniform across the system with 
 ; a screening constant of 15. When using PME, please make sure your 
@@ -81,27 +51,21 @@ periodic_molecules 	 = yes
 ; (epsilon_r) should have a value of 2.5, representative of a low-dielectric
 ; apolar solvent. The polarizable water itself will perform the explicit screening
 ; in aqueous environment. In this case, the use of PME is more realistic.
-;
-; For use in combination with the Verlet-pairlist algorithm implemented
-; in Gromacs 4.6 a straight cutoff in combination with the potential
-; modifiers can be used. Although this will change the potential shape, 
-; preliminary results indicate that forcefield properties do not change a lot
-; when the LJ cutoff is reduced to 1.1 nm. Be sure to test the effects for 
-; your particular system. The advantage is a gain of speed of 50-100%.
 
-coulombtype              = Shift  ;Reaction_field (for use with Verlet-pairlist) ;PME (especially with polarizable water)
-rcoulomb_switch          = 0.0
-rcoulomb                 = 1.2
+
+cutoff-scheme            = Verlet
+nstlist                  = 20
+ns_type                  = grid
+pbc                      = xyz
+verlet-buffer-tolerance  = 0.005
+
+coulombtype              = cutoff 
+coulomb-modifier         = Potential-shift-verlet
+rcoulomb                 = 1.1
 epsilon_r                = 15	; 2.5 (with polarizable water)
-vdw_type                 = Shift  ;cutoff (for use with Verlet-pairlist)   
-rvdw_switch              = 0.9
-rvdw                     = 1.2	;1.1 (for use with Verlet-pairlist)
-
-;cutoff-scheme            = verlet
-;coulomb-modifier         = Potential-shift
-;vdw-modifier             = Potential-shift
-;epsilon_rf               = 0   ; epsilon_rf = 0 really means epsilon_rf = infinity
-;verlet-buffer-drift      = 0.005
+vdw_type                 = cutoff  
+vdw-modifier             = Potential-shift-verlet
+rvdw                     = 1.1
 
 
 ; MARTINI and TEMPERATURE/PRESSURE
@@ -125,12 +89,12 @@ rvdw                     = 1.2	;1.1 (for use with Verlet-pairlist)
 
 tcoupl                   = berendsen  ; v-rescale 
 tc-grps                  = Membrane Water
-tau_t                    = 1.0    1.0
+tau_t                    = 2.0    2.0
 ref_t                    = 300    300
 
-Pcoupl                   = berendsen	  ; berendsen  ; parrinello-rahma
-Pcoupltype               = semiisotropic  ; isotropic
-tau_p                    = 3.0  3.0       ; 12.0 12.0  ;parrinello-rahman is more stable with larger tau-p, DdJ, 20130422
+Pcoupl                   = berendsen     ; parrinello-rahma
+Pcoupltype               = semiisotropic
+tau_p                    = 4.0           ; 12.0  ;parrinello-rahman is more stable with larger tau-p, DdJ, 20130422
 compressibility          = 3e-4 3e-4
 ref_p                    = 1.0  1.0
 refcoord_scaling         = all
@@ -139,11 +103,7 @@ gen_vel                  = yes
 gen_temp                 = 300
 gen_seed                 = 473529
 
-
 annealing 		 = no
-annealing-npoints 	 = 5
-annealing-time 		 = 0 	2000 	4000	6000	10000
-annealing-temp 		 = 300 	350	400 	350 	298 
 
 
 ; MARTINI and CONSTRAINTS 
