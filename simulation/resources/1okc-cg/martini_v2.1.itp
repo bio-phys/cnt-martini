@@ -1,0 +1,3277 @@
+; Last Updated 28/4/09
+;
+; MARTINI FORCEFIELD V2.1 - TRYOUT VERSION 
+; 
+; SJ MARRINK, 12-12-2007
+;
+; please cite:
+;
+; L. Monticelli, S. Kandasamy, X. Periole, R. Larson, D.P. Tieleman, S.J. Marrink.
+; The MARTINI coarse grained force field: extension to proteins.
+; Submitted, 2007
+;
+; S.J. Marrink, H.J. Risselada, S. Yefimov, D.P. Tieleman, A.H. de Vries.
+; The MARTINI forcefield: coarse grained model for biomolecular simulations.
+; JPC-B, 111:7812-7824, 2007.
+;
+; and (if using lipid topologies):
+;
+; S.J. Marrink, A.H. de Vries, A.E. Mark.
+; Coarse grained model for semi-quantitative lipid simulations.
+; JPC-B, 108:750-760, 2004.
+
+
+[ defaults ]
+1 1
+
+[ atomtypes ]
+
+; Currently eighteen particle types are defined, divided into four main categories 
+; (P, polar; N, intermediate; C, apolar; Q, charged)
+; each of which has a number of sublevels (0,a,d, or ad) 
+; subtype 0 has no hydrogen bond forming capacities,
+; subtype d has some hydrogen donor capacities, 
+; subtype a some hydrogen acceptor capacities, 
+; and subtype da has both donor and acceptor capacities 
+; or (1,2,3,4,5) where subtype 5 is more polar than 1.
+
+; Two main classes of particles are furthermore distinguished, namely
+; STANDARD particles which are mapped using a 4:1 mapping scheme, and
+; RING particles which are used for ring compounds mapped 2-3:1.
+; A special BIG particle type is defined in addition to prevent freezing of CG water.
+; Two AMINO acid particle types are used to avoid Q-C clashes inside proteins.
+
+; For reasons of computational efficiency, all particle masses are set to 72 amu.
+; For realistic dynamics, especially of ring systems, the particle masses should be adapted. 
+; This might require a reduction of the integration timestep, however.
+
+; name mass charge ptype c6 c12
+
+; STANDARD types, 4:1 mapping
+; polar type
+P5 72.0 0.000 A 0.0 0.0
+P4 72.0 0.000 A 0.0 0.0
+P3 72.0 0.000 A 0.0 0.0
+P2 72.0 0.000 A 0.0 0.0
+P1 72.0 0.000 A 0.0 0.0
+; intermediate polar
+Nda 72.0 0.000 A 0.0 0.0 
+Nd 72.0 0.000 A 0.0 0.0
+Na 72.0 0.000 A 0.0 0.0
+N0 72.0 0.000 A 0.0 0.0
+; apolar
+C5 72.0 0.000 A 0.0 0.0
+C4 72.0 0.000 A 0.0 0.0
+C3 72.0 0.000 A 0.0 0.0
+C2 72.0 0.000 A 0.0 0.0
+C1 72.0 0.000 A 0.0 0.0
+; charged
+Qda 72.0 0.000 A 0.0 0.0
+Qd 72.0 0.000 A 0.0 0.0
+Qa 72.0 0.000 A 0.0 0.0
+Q0 72.0 0.000 A 0.0 0.0
+
+; RING types, 2-3:1 mapping (only few types are defined here)
+SP4 45.0 0.000 A 0.0 0.0
+SP1 45.0 0.000 A 0.0 0.0
+SNd 45.0 0.000 A 0.0 0.0
+SNa 45.0 0.000 A 0.0 0.0
+SC5 45.0 0.000 A 0.0 0.0
+SC4 45.0 0.000 A 0.0 0.0
+SC3 45.0 0.000 A 0.0 0.0
+SC2 45.0 0.000 A 0.0 0.0
+SC1 45.0 0.000 A 0.0 0.0
+
+; AMINO ACIDS (required for Q-C interactions inside proteins)
+AC2 72.0 0.000 A 0.0 0.0
+AC1 72.0 0.000 A 0.0 0.0
+
+; BIG particle type (to prevent freezing of water)
+BP4 72.0 0.000 A 0.0 0.0
+
+; PSEUDO-particles (currently used with sbcbcarbs)
+Inv 50.00 0.000 A 0.0 0.0 ; The invisible
+
+[ nonbond_params ]
+
+; levels of LJ interaction:
+ 
+; O 	- supra attractive: 	(eps=5.6, s=0.47) 
+; I 	- attractive: 		(eps=5.0, s=0.47) 
+; II 	- almost attractive: 	(eps=4.5, s=0.47)
+; III 	- semi attractive:	(eps=4.0, s=0.47) 
+; IV 	- intermediate: 	(eps=3.5, s=0.47) 
+; V 	- almost intermediate: 	(eps=3.1, s=0.47) 
+; VI 	- semi repulsive: 	(eps=2.7, s=0.47) 
+; VII 	- almost repulsive: 	(eps=2.3, s=0.47) 
+; VIII	- repulsive: 		(eps=2.0, s=0.47)
+; IX 	- super repulsive: 	(eps=2.0, s=0.62)
+;
+; RINGS: for ring-ring interactions eps is reduced to 75%, sigma=0.43.
+
+; i j	funda c6 c12 
+; self terms
+  P5 	P5 	1 	0.24145E-00 	0.26027E-02 ; supra attractive
+  P4 	P4 	1 	0.21558E-00 	0.23238E-02 ; attractive 
+  BP4 	BP4 	1 	0.21558E-00 	0.23238E-02 ; attractive
+  SP4 	SP4 	1 	0.94820E-01 	0.59939E-03 ; 75attractive, s=0.43
+  P3 	P3 	1 	0.21558E-00 	0.23238E-02 ; attractive 
+  P2 	P2 	1 	0.19402E-00 	0.20914E-02 ; almost attractive
+  P1 	P1 	1 	0.19402E-00 	0.20914E-02 ; almost attractive
+  SP1 	SP1 	1 	0.85338E-01 	0.53946E-03 ; 75almost attractive, s=0.43
+  Nda 	Nda 	1 	0.19402E-00 	0.20914E-02 ; almost attractive
+  Nd 	Nd 	1 	0.17246E-00 	0.18590E-02 ; semi attractive
+  SNd 	SNd 	1 	0.75856E-01 	0.47952E-03 ; 75semi attractive, s=0.43
+  Na 	Na 	1 	0.17246E-00 	0.18590E-02 ; semi attractive
+  SNa 	SNa 	1 	0.75856E-01 	0.47952E-03 ; 75semi attractive, s=0.43
+  N0 	N0 	1 	0.15091E-00 	0.16267E-02 ; intermediate 
+  C5 	C5 	1 	0.15091E-00 	0.16267E-02 ; intermediate 
+  SC5 	SC5 	1 	0.66375E-01 	0.41957E-03 ; 75intermediate, s=0.43
+  C4 	C4 	1 	0.15091E-00 	0.16267E-02 ; intermediate 
+  SC4 	SC4 	1 	0.66375E-01 	0.41957E-03 ; 75intermediate, s=0.43
+  C3 	C3 	1 	0.15091E-00 	0.16267E-02 ; intermediate 
+  SC3 	SC3 	1 	0.66375E-01 	0.41957E-03 ; 75intermediate, s=0.43
+  C2 	C2 	1 	0.15091E-00 	0.16267E-02 ; intermediate 
+  AC2 	AC2 	1 	0.15091E-00 	0.16267E-02 ; intermediate 
+  SC2 	SC2 	1 	0.66375E-01 	0.41957E-03 ; 75intermediate, s=0.43
+  C1 	C1 	1 	0.15091E-00 	0.16267E-02 ; intermediate 
+  AC1 	AC1 	1 	0.15091E-00 	0.16267E-02 ; intermediate 
+  SC1 	SC1 	1 	0.66375E-01 	0.41957E-03 ; 75intermediate, s=0.43
+  Qda 	Qda 	1 	0.24145E-00 	0.26027E-02 ; supra attractive
+  Qd 	Qd 	1 	0.21558E-00 	0.23238E-02 ; attractive 
+  Qa 	Qa 	1 	0.21558E-00 	0.23238E-02 ; attractive 
+  Q0 	Q0 	1 	0.15091E-00 	0.16267E-02 ; intermediate 
+; cross terms
+  P5 	P4 	1 	0.24145E-00 	0.26027E-02 ; supra attractive
+  P5 	BP4 	1 	0.24145E-00 	0.26027E-02 ; supra attractive
+  P5 	SP4 	1 	0.24145E-00 	0.26027E-02 ; supra attractive
+  P5 	P3 	1 	0.24145E-00 	0.26027E-02 ; supra attractive
+  P5 	P2 	1 	0.24145E-00 	0.26027E-02 ; supra attractive
+  P5 	P1 	1 	0.24145E-00 	0.26027E-02 ; supra attractive
+  P5 	SP1 	1 	0.24145E-00 	0.26027E-02 ; supra attractive
+  P5 	Nda 	1 	0.21558E-00 	0.23238E-02 ; attractive 
+  P5 	Nd 	1 	0.21558E-00 	0.23238E-02 ; attractive 
+  P5 	SNd 	1 	0.21558E-00 	0.23238E-02 ; attractive 
+  P5 	Na 	1 	0.21558E-00 	0.23238E-02 ; attractive 
+  P5 	SNa 	1 	0.21558E-00 	0.23238E-02 ; attractive 
+  P5 	N0 	1 	0.15091E-00 	0.16267E-02 ; intermediate 
+  P5 	C5 	1 	0.13366E-00 	0.14408E-02 ; almost intermediate 
+  P5 	SC5 	1 	0.13366E-00 	0.14408E-02 ; almost intermediate 
+  P5 	C4 	1 	0.11642E-00 	0.12549E-02 ; semi repulsive
+  P5 	SC4 	1 	0.11642E-00 	0.12549E-02 ; semi repulsive
+  P5 	C3 	1 	0.11642E-00 	0.12549E-02 ; semi repulsive
+  P5 	SC3 	1 	0.11642E-00 	0.12549E-02 ; semi repulsive
+  P5 	C2 	1 	0.99167E-01 	0.10690E-02 ; almost repulsive 
+  P5 	AC2 	1 	0.99167E-01 	0.10690E-02 ; almost repulsive 
+  P5 	SC2 	1 	0.99167E-01 	0.10690E-02 ; almost repulsive 
+  P5 	C1 	1 	0.86233E-01 	0.92953E-03 ; repulsive 
+  P5 	AC1 	1 	0.86233E-01 	0.92953E-03 ; repulsive 
+  P5 	SC1 	1 	0.86233E-01 	0.92953E-03 ; repulsive 
+  P5 	Qda 	1 	0.24145E-00 	0.26027E-02 ; supra attractive
+  P5 	Qd 	1 	0.24145E-00 	0.26027E-02 ; supra attractive
+  P5 	Qa 	1 	0.24145E-00 	0.26027E-02 ; supra attractive
+  P5 	Q0 	1 	0.21558E-00 	0.23238E-02 ; attractive 
+  P4 	BP4 	1 	0.76824E-00 	0.26348E-01 ; supra attractive, s=0.57
+  P4 	SP4 	1 	0.21558E-00 	0.23238E-02 ; attractive 
+  P4 	P3 	1 	0.21558E-00 	0.23238E-02 ; attractive 
+  P4 	P2 	1 	0.19402E-00 	0.20914E-02 ; almost attractive
+  P4 	P1 	1 	0.19402E-00 	0.20914E-02 ; almost attractive
+  P4 	SP1 	1 	0.19402E-00 	0.20914E-02 ; almost attractive
+  P4 	Nda 	1 	0.17246E-00 	0.18590E-02 ; semi attractive
+  P4 	Nd 	1 	0.17246E-00 	0.18590E-02 ; semi attractive
+  P4 	SNd 	1 	0.17246E-00 	0.18590E-02 ; semi attractive
+  P4 	Na 	1 	0.17246E-00 	0.18590E-02 ; semi attractive
+  P4 	SNa 	1 	0.17246E-00 	0.18590E-02 ; semi attractive
+  P4 	N0 	1 	0.15091E-00 	0.16267E-02 ; intermediate 
+  P4 	C5 	1 	0.13366E-00 	0.14408E-02 ; almost intermediate 
+  P4 	SC5 	1 	0.13366E-00 	0.14408E-02 ; almost intermediate 
+  P4 	C4 	1 	0.11642E-00 	0.12549E-02 ; semi repulsive
+  P4 	SC4 	1 	0.11642E-00 	0.12549E-02 ; semi repulsive
+  P4 	C3 	1 	0.11642E-00 	0.12549E-02 ; semi repulsive
+  P4 	SC3 	1 	0.11642E-00 	0.12549E-02 ; semi repulsive
+  P4 	C2 	1 	0.99167E-01 	0.10690E-02 ; almost repulsive 
+  P4 	AC2 	1 	0.99167E-01 	0.10690E-02 ; almost repulsive 
+  P4 	SC2 	1 	0.99167E-01 	0.10690E-02 ; almost repulsive 
+  P4 	C1 	1 	0.86233E-01 	0.92953E-03 ; repulsive 
+  P4 	AC1 	1 	0.86233E-01 	0.92953E-03 ; repulsive 
+  P4 	SC1 	1 	0.86233E-01 	0.92953E-03 ; repulsive 
+  P4 	Qda 	1 	0.24145E-00 	0.26027E-02 ; supra attractive
+  P4 	Qd 	1 	0.24145E-00 	0.26027E-02 ; supra attractive
+  P4 	Qa 	1 	0.24145E-00 	0.26027E-02 ; supra attractive
+  P4 	Q0 	1 	0.24145E-00 	0.26027E-02 ; supra attractive
+  BP4	SP4 	1 	0.21558E-00 	0.23238E-02 ; attractive 
+  BP4	P3 	1 	0.21558E-00 	0.23238E-02 ; attractive 
+  BP4 	P2 	1 	0.19402E-00 	0.20914E-02 ; almost attractive
+  BP4 	P1 	1 	0.19402E-00 	0.20914E-02 ; almost attractive
+  BP4 	SP1 	1 	0.19402E-00 	0.20914E-02 ; almost attractive
+  BP4 	Nda 	1 	0.17246E-00 	0.18590E-02 ; semi attractive
+  BP4 	Nd 	1 	0.17246E-00 	0.18590E-02 ; semi attractive
+  BP4 	SNd 	1 	0.17246E-00 	0.18590E-02 ; semi attractive
+  BP4 	Na 	1 	0.17246E-00 	0.18590E-02 ; semi attractive
+  BP4 	SNa 	1 	0.17246E-00 	0.18590E-02 ; semi attractive
+  BP4 	N0 	1 	0.15091E-00 	0.16267E-02 ; intermediate 
+  BP4 	C5 	1 	0.13366E-00 	0.14408E-02 ; almost intermediate 
+  BP4 	SC5 	1 	0.13366E-00 	0.14408E-02 ; almost intermediate 
+  BP4 	C4 	1 	0.11642E-00 	0.12549E-02 ; semi repulsive
+  BP4 	SC4 	1 	0.11642E-00 	0.12549E-02 ; semi repulsive
+  BP4 	C3 	1 	0.11642E-00 	0.12549E-02 ; semi repulsive
+  BP4 	SC3 	1 	0.11642E-00 	0.12549E-02 ; semi repulsive
+  BP4 	C2 	1 	0.99167E-01 	0.10690E-02 ; almost repulsive 
+  BP4 	AC2 	1 	0.99167E-01 	0.10690E-02 ; almost repulsive 
+  BP4 	SC2 	1 	0.99167E-01 	0.10690E-02 ; almost repulsive 
+  BP4 	C1 	1 	0.86233E-01 	0.92953E-03 ; repulsive 
+  BP4 	AC1 	1 	0.86233E-01 	0.92953E-03 ; repulsive 
+  BP4 	SC1 	1 	0.86233E-01 	0.92953E-03 ; repulsive 
+  BP4 	Qda 	1 	0.24145E-00 	0.26027E-02 ; supra attractive
+  BP4 	Qd 	1 	0.24145E-00 	0.26027E-02 ; supra attractive
+  BP4 	Qa 	1 	0.24145E-00 	0.26027E-02 ; supra attractive
+  BP4 	Q0 	1 	0.24145E-00 	0.26027E-02 ; supra attractive
+  SP4 	P3 	1 	0.21558E-00 	0.23238E-02 ; attractive 
+  SP4 	P2 	1 	0.19402E-00 	0.20914E-02 ; almost attractive
+  SP4 	P1 	1 	0.19402E-00 	0.20914E-02 ; almost attractive
+  SP4 	SP1 	1 	0.85338E-01 	0.53946E-03 ; 75almost attractive, s=0.43
+  SP4 	Nda 	1 	0.17246E-00 	0.18590E-02 ; semi attractive
+  SP4 	Nd 	1 	0.17246E-00 	0.18590E-02 ; semi attractive
+  SP4 	SNd 	1 	0.75856E-01 	0.47952E-03 ; 75semi attractive, s=0.43
+  SP4 	Na 	1 	0.17246E-00 	0.18590E-02 ; semi attractive
+  SP4 	SNa 	1 	0.75856E-01 	0.47952E-03 ; 75semi attractive, s=0.43
+  SP4 	N0 	1 	0.15091E-00 	0.16267E-02 ; intermediate 
+  SP4 	C5 	1 	0.13366E-00 	0.14408E-02 ; almost intermediate 
+  SP4 	SC5 	1 	0.58789E-01 	0.37162E-03 ; 75almost intermediate, s=0.43
+  SP4 	C4 	1 	0.11642E-00 	0.12549E-02 ; semi repulsive
+  SP4 	SC4 	1 	0.51203E-01 	0.32367E-03 ; 75semi repulsive s=0.43
+  SP4 	C3 	1 	0.11642E-00 	0.12549E-02 ; semi repulsive
+  SP4 	SC3 	1 	0.51203E-01 	0.32367E-03 ; 75semi repulsive s=0.43
+  SP4 	C2 	1 	0.99167E-01 	0.10690E-02 ; almost repulsive 
+  SP4 	AC2 	1 	0.99167E-01 	0.10690E-02 ; almost repulsive 
+  SP4 	SC2 	1 	0.43617E-01 	0.27572E-03 ; 75almost repulsive, s=0.43
+  SP4 	C1 	1 	0.86233E-01 	0.92953E-03 ; repulsive 
+  SP4 	AC1 	1 	0.86233E-01 	0.92953E-03 ; repulsive 
+  SP4 	SC1 	1 	0.37928E-01 	0.23976E-03 ; 75repulsive, s=0.43
+  SP4 	Qda 	1 	0.24145E-00 	0.26027E-02 ; supra attractive
+  SP4 	Qd 	1 	0.24145E-00 	0.26027E-02 ; supra attractive
+  SP4 	Qa 	1 	0.24145E-00 	0.26027E-02 ; supra attractive
+  SP4 	Q0 	1 	0.24145E-00 	0.26027E-02 ; supra attractive
+  P3 	P2 	1 	0.19402E-00 	0.20914E-02 ; almost attractive
+  P3 	P1 	1 	0.19402E-00 	0.20914E-02 ; almost attractive
+  P3 	SP1 	1 	0.19402E-00 	0.20914E-02 ; almost attractive
+  P3 	Nda 	1 	0.19402E-00 	0.20914E-02 ; almost attractive
+  P3 	Nd 	1 	0.19402E-00 	0.20914E-02 ; almost attractive
+  P3 	SNd 	1 	0.19402E-00 	0.20914E-02 ; almost attractive
+  P3 	Na 	1 	0.19402E-00 	0.20914E-02 ; almost attractive
+  P3 	SNa 	1 	0.19402E-00 	0.20914E-02 ; almost attractive
+  P3 	N0 	1 	0.15091E-00 	0.16267E-02 ; intermediate 
+  P3 	C5 	1 	0.15091E-00 	0.16267E-02 ; intermediate 
+  P3 	SC5 	1 	0.15091E-00 	0.16267E-02 ; intermediate 
+  P3 	C4 	1 	0.13366E-00 	0.14408E-02 ; almost intermediate 
+  P3 	SC4 	1 	0.13366E-00 	0.14408E-02 ; almost intermediate 
+  P3 	C3 	1 	0.13366E-00 	0.14408E-02 ; almost intermediate 
+  P3 	SC3 	1 	0.13366E-00 	0.14408E-02 ; almost intermediate 
+  P3 	C2 	1 	0.11642E-00 	0.12549E-02 ; semi repulsive
+  P3 	AC2 	1 	0.11642E-00 	0.12549E-02 ; semi repulsive
+  P3 	SC2 	1 	0.11642E-00 	0.12549E-02 ; semi repulsive
+  P3 	C1 	1 	0.99167E-01 	0.10690E-02 ; almost repulsive 
+  P3 	AC1 	1 	0.99167E-01 	0.10690E-02 ; almost repulsive 
+  P3 	SC1 	1 	0.99167E-01 	0.10690E-02 ; almost repulsive 
+  P3 	Qda 	1 	0.24145E-00 	0.26027E-02 ; supra attractive
+  P3 	Qd 	1 	0.24145E-00 	0.26027E-02 ; supra attractive
+  P3 	Qa 	1 	0.24145E-00 	0.26027E-02 ; supra attractive
+  P3 	Q0 	1 	0.21558E-00 	0.23238E-02 ; attractive 
+  P2 	P1 	1 	0.19402E-00 	0.20914E-02 ; almost attractive
+  P2 	SP1 	1 	0.19402E-00 	0.20914E-02 ; almost attractive
+  P2 	Nda 	1 	0.19402E-00 	0.20914E-02 ; almost attractive
+  P2 	Nd 	1 	0.19402E-00 	0.20914E-02 ; almost attractive
+  P2 	SNd 	1 	0.19402E-00 	0.20914E-02 ; almost attractive
+  P2 	Na 	1 	0.19402E-00 	0.20914E-02 ; almost attractive
+  P2 	SNa 	1 	0.19402E-00 	0.20914E-02 ; almost attractive
+  P2 	N0 	1 	0.17246E-00 	0.18590E-02 ; semi attractive
+  P2 	C5 	1 	0.15091E-00 	0.16267E-02 ; intermediate 
+  P2 	SC5 	1 	0.15091E-00 	0.16267E-02 ; intermediate 
+  P2 	C4 	1 	0.15091E-00 	0.16267E-02 ; intermediate 
+  P2 	SC4 	1 	0.15091E-00 	0.16267E-02 ; intermediate 
+  P2 	C3 	1 	0.13366E-00 	0.14408E-02 ; almost intermediate 
+  P2 	SC3 	1 	0.13366E-00 	0.14408E-02 ; almost intermediate 
+  P2 	C2 	1 	0.11642E-00 	0.12549E-02 ; semi repulsive
+  P2 	AC2 	1 	0.11642E-00 	0.12549E-02 ; semi repulsive
+  P2 	SC2 	1 	0.11642E-00 	0.12549E-02 ; semi repulsive
+  P2 	C1 	1 	0.99167E-01 	0.10690E-02 ; almost repulsive 
+  P2 	AC1 	1 	0.99167E-01 	0.10690E-02 ; almost repulsive 
+  P2 	SC1 	1 	0.99167E-01 	0.10690E-02 ; almost repulsive 
+  P2 	Qda 	1 	0.21558E-00 	0.23238E-02 ; attractive 
+  P2 	Qd 	1 	0.21558E-00 	0.23238E-02 ; attractive 
+  P2 	Qa 	1 	0.21558E-00 	0.23238E-02 ; attractive 
+  P2 	Q0 	1 	0.19402E-00 	0.20914E-02 ; almost attractive
+  P1 	SP1 	1 	0.19402E-00 	0.20914E-02 ; almost attractive
+  P1 	Nda 	1 	0.19402E-00 	0.20914E-02 ; almost attractive
+  P1 	Nd 	1 	0.19402E-00 	0.20914E-02 ; almost attractive
+  P1 	SNd 	1 	0.19402E-00 	0.20914E-02 ; almost attractive
+  P1 	Na 	1 	0.19402E-00 	0.20914E-02 ; almost attractive
+  P1 	SNa 	1 	0.19402E-00 	0.20914E-02 ; almost attractive
+  P1 	N0 	1 	0.17246E-00 	0.18590E-02 ; semi attractive
+  P1 	C5 	1 	0.15091E-00 	0.16267E-02 ; intermediate 
+  P1 	SC5 	1 	0.15091E-00 	0.16267E-02 ; intermediate 
+  P1 	C4 	1 	0.15091E-00 	0.16267E-02 ; intermediate 
+  P1 	SC4 	1 	0.15091E-00 	0.16267E-02 ; intermediate 
+  P1 	C3 	1 	0.15091E-00 	0.16267E-02 ; intermediate 
+  P1 	SC3 	1 	0.15091E-00 	0.16267E-02 ; intermediate 
+  P1 	C2 	1 	0.13366E-00 	0.14408E-02 ; almost intermediate 
+  P1 	AC2 	1 	0.13366E-00 	0.14408E-02 ; almost intermediate 
+  P1 	SC2 	1 	0.13366E-00 	0.14408E-02 ; almost intermediate 
+  P1 	C1 	1 	0.11642E-00 	0.12549E-02 ; semi repulsive
+  P1 	AC1 	1 	0.11642E-00 	0.12549E-02 ; semi repulsive
+  P1 	SC1 	1 	0.11642E-00 	0.12549E-02 ; semi repulsive
+  P1 	Qda 	1 	0.21558E-00 	0.23238E-02 ; attractive 
+  P1 	Qd 	1 	0.21558E-00 	0.23238E-02 ; attractive 
+  P1 	Qa 	1 	0.21558E-00 	0.23238E-02 ; attractive 
+  P1 	Q0 	1 	0.17246E-00 	0.18590E-02 ; semi attractive
+  SP1	Nda 	1 	0.19402E-00 	0.20914E-02 ; almost attractive
+  SP1	Nd 	1 	0.19402E-00 	0.20914E-02 ; almost attractive
+  SP1 	SNd 	1 	0.85338E-01 	0.53946E-03 ; 75almost attractive, s=0.43
+  SP1 	Na 	1 	0.19402E-00 	0.20914E-02 ; almost attractive
+  SP1 	SNa 	1 	0.85338E-01 	0.53946E-03 ; 75almost attractive, s=0.43
+  SP1 	N0 	1 	0.17246E-00 	0.18590E-02 ; semi attractive
+  SP1 	C5 	1 	0.15091E-00 	0.16267E-02 ; intermediate 
+  SP1 	SC5 	1 	0.66375E-01 	0.41957E-03 ; 75intermediate, s=0.43
+  SP1 	C4 	1 	0.15091E-00 	0.16267E-02 ; intermediate 
+  SP1 	SC4 	1 	0.66375E-01 	0.41957E-03 ; 75intermediate, s=0.43
+  SP1 	C3 	1 	0.15091E-00 	0.16267E-02 ; intermediate 
+  SP1 	SC3 	1 	0.66375E-01 	0.41957E-03 ; 75intermediate, s=0.43
+  SP1 	C2 	1 	0.13366E-00 	0.14408E-02 ; almost intermediate 
+  SP1 	AC2 	1 	0.13366E-00 	0.14408E-02 ; almost intermediate 
+  SP1 	SC2 	1 	0.58789E-01 	0.37162E-03 ; 75almost intermediate, s=0.43
+  SP1 	C1 	1 	0.11642E-00 	0.12549E-02 ; semi repulsive
+  SP1 	AC1 	1 	0.11642E-00 	0.12549E-02 ; semi repulsive
+  SP1 	SC1 	1 	0.51203E-01 	0.32367E-03 ; 75semi repulsive s=0.43
+  SP1 	Qda 	1 	0.21558E-00 	0.23238E-02 ; attractive 
+  SP1 	Qd 	1 	0.21558E-00 	0.23238E-02 ; attractive 
+  SP1 	Qa 	1 	0.21558E-00 	0.23238E-02 ; attractive 
+  SP1 	Q0 	1 	0.21558E-00 	0.23238E-02 ; attractive 
+  Nda 	Nd 	1 	0.19402E-00 	0.20914E-02 ; almost attractive
+  Nda 	SNd 	1 	0.19402E-00 	0.20914E-02 ; almost attractive
+  Nda 	Na 	1 	0.19402E-00 	0.20914E-02 ; almost attractive
+  Nda 	SNa 	1 	0.19402E-00 	0.20914E-02 ; almost attractive
+  Nda 	N0 	1 	0.15091E-00 	0.16267E-02 ; intermediate 
+  Nda 	C5 	1 	0.15091E-00 	0.16267E-02 ; intermediate 
+  Nda 	SC5 	1 	0.15091E-00 	0.16267E-02 ; intermediate 
+  Nda 	C4 	1 	0.13366E-00 	0.14408E-02 ; almost intermediate 
+  Nda 	SC4 	1 	0.13366E-00 	0.14408E-02 ; almost intermediate 
+  Nda 	C3 	1 	0.11642E-00 	0.12549E-02 ; semi repulsive
+  Nda 	SC3 	1 	0.11642E-00 	0.12549E-02 ; semi repulsive
+  Nda 	C2 	1 	0.11642E-00 	0.12549E-02 ; semi repulsive
+  Nda 	AC2 	1 	0.11642E-00 	0.12549E-02 ; semi repulsive
+  Nda 	SC2 	1 	0.11642E-00 	0.12549E-02 ; semi repulsive
+  Nda 	C1 	1 	0.11642E-00 	0.12549E-02 ; semi repulsive
+  Nda 	AC1 	1 	0.11642E-00 	0.12549E-02 ; semi repulsive
+  Nda 	SC1 	1 	0.11642E-00 	0.12549E-02 ; semi repulsive
+  Nda 	Qda 	1 	0.21558E-00 	0.23238E-02 ; attractive 
+  Nda 	Qd 	1 	0.21558E-00 	0.23238E-02 ; attractive 
+  Nda 	Qa 	1 	0.21558E-00 	0.23238E-02 ; attractive 
+  Nda 	Q0 	1 	0.17246E-00 	0.18590E-02 ; semi attractive
+  Nd 	SNd 	1 	0.17246E-00 	0.18590E-02 ; semi attractive
+  Nd 	Na 	1 	0.19402E-00 	0.20914E-02 ; almost attractive
+  Nd 	SNa 	1 	0.19402E-00 	0.20914E-02 ; almost attractive
+  Nd 	N0 	1 	0.15091E-00 	0.16267E-02 ; intermediate 
+  Nd 	C5 	1 	0.15091E-00 	0.16267E-02 ; intermediate 
+  Nd 	SC5 	1 	0.15091E-00 	0.16267E-02 ; intermediate 
+  Nd 	C4 	1 	0.13366E-00 	0.14408E-02 ; almost intermediate 
+  Nd 	SC4 	1 	0.13366E-00 	0.14408E-02 ; almost intermediate 
+  Nd 	C3 	1 	0.11642E-00 	0.12549E-02 ; semi repulsive
+  Nd 	SC3 	1 	0.11642E-00 	0.12549E-02 ; semi repulsive
+  Nd 	C2 	1 	0.11642E-00 	0.12549E-02 ; semi repulsive
+  Nd 	AC2 	1 	0.11642E-00 	0.12549E-02 ; semi repulsive
+  Nd 	SC2 	1 	0.11642E-00 	0.12549E-02 ; semi repulsive
+  Nd 	C1 	1 	0.11642E-00 	0.12549E-02 ; semi repulsive
+  Nd 	AC1 	1 	0.11642E-00 	0.12549E-02 ; semi repulsive
+  Nd 	SC1 	1 	0.11642E-00 	0.12549E-02 ; semi repulsive
+  Nd 	Qda 	1 	0.21558E-00 	0.23238E-02 ; attractive 
+  Nd 	Qd 	1 	0.17246E-00 	0.18590E-02 ; semi attractive
+  Nd 	Qa 	1 	0.21558E-00 	0.23238E-02 ; attractive 
+  Nd 	Q0 	1 	0.17246E-00 	0.18590E-02 ; semi attractive
+  SNd 	Na 	1 	0.19402E-00 	0.20914E-02 ; almost attractive
+  SNd 	SNa 	1 	0.85338E-01 	0.53946E-03 ; 75almost attractive, s=0.43
+  SNd 	N0 	1 	0.15091E-00 	0.16267E-02 ; intermediate 
+  SNd 	C5 	1 	0.15091E-00 	0.16267E-02 ; intermediate 
+  SNd 	SC5 	1 	0.66375E-01 	0.41957E-03 ; 75intermediate, s=0.43
+  SNd 	C4 	1 	0.13366E-00 	0.14408E-02 ; almost intermediate 
+  SNd 	SC4 	1 	0.58789E-01 	0.37162E-03 ; 75almost intermediate, s=0.43
+  SNd 	C3 	1 	0.11642E-00 	0.12549E-02 ; semi repulsive
+  SNd 	SC3 	1 	0.51203E-01 	0.32367E-03 ; 75semi repulsive s=0.43
+  SNd 	C2 	1 	0.11642E-00 	0.12549E-02 ; semi repulsive
+  SNd 	AC2 	1 	0.11642E-00 	0.12549E-02 ; semi repulsive
+  SNd 	SC2 	1 	0.51203E-01 	0.32367E-03 ; 75semi repulsive s=0.43
+  SNd 	C1 	1 	0.11642E-00 	0.12549E-02 ; semi repulsive
+  SNd 	AC1 	1 	0.11642E-00 	0.12549E-02 ; semi repulsive
+  SNd 	SC1 	1 	0.51203E-01 	0.32367E-03 ; 75semi repulsive s=0.43
+  SNd 	Qda 	1 	0.21558E-00 	0.23238E-02 ; attractive 
+  SNd 	Qd 	1 	0.17246E-00 	0.18590E-02 ; semi attractive
+  SNd 	Qa 	1 	0.21558E-00 	0.23238E-02 ; attractive 
+  SNd 	Q0 	1 	0.17246E-00 	0.18590E-02 ; semi attractive
+  Na 	SNa 	1 	0.17246E-00 	0.18590E-02 ; semi attractive
+  Na 	N0 	1 	0.15091E-00 	0.16267E-02 ; intermediate 
+  Na 	C5 	1 	0.15091E-00 	0.16267E-02 ; intermediate 
+  Na 	SC5 	1 	0.15091E-00 	0.16267E-02 ; intermediate 
+  Na 	C4 	1 	0.13366E-00 	0.14408E-02 ; almost intermediate 
+  Na 	SC4 	1 	0.13366E-00 	0.14408E-02 ; almost intermediate 
+  Na 	C3 	1 	0.11642E-00 	0.12549E-02 ; semi repulsive
+  Na 	SC3 	1 	0.11642E-00 	0.12549E-02 ; semi repulsive
+  Na 	C2 	1 	0.11642E-00 	0.12549E-02 ; semi repulsive
+  Na 	AC2 	1 	0.11642E-00 	0.12549E-02 ; semi repulsive
+  Na 	SC2 	1 	0.11642E-00 	0.12549E-02 ; semi repulsive
+  Na 	C1 	1 	0.11642E-00 	0.12549E-02 ; semi repulsive
+  Na 	AC1 	1 	0.11642E-00 	0.12549E-02 ; semi repulsive
+  Na 	SC1 	1 	0.11642E-00 	0.12549E-02 ; semi repulsive
+  Na 	Qda 	1 	0.21558E-00 	0.23238E-02 ; attractive 
+  Na 	Qd 	1 	0.21558E-00 	0.23238E-02 ; attractive 
+  Na 	Qa 	1 	0.17246E-00 	0.18590E-02 ; semi attractive
+  Na 	Q0 	1 	0.17246E-00 	0.18590E-02 ; semi attractive
+  SNa 	N0 	1 	0.15091E-00 	0.16267E-02 ; intermediate 
+  SNa 	C5 	1 	0.15091E-00 	0.16267E-02 ; intermediate 
+  SNa 	SC5 	1 	0.66375E-01 	0.41957E-03 ; 75intermediate, s=0.43
+  SNa 	C4 	1 	0.13366E-00 	0.14408E-02 ; almost intermediate 
+  SNa 	SC4 	1 	0.58789E-01 	0.37162E-03 ; 75almost intermediate, s=0.43
+  SNa 	C3 	1 	0.11642E-00 	0.12549E-02 ; semi repulsive
+  SNa 	SC3 	1 	0.51203E-01 	0.32367E-03 ; 75semi repulsive s=0.43
+  SNa 	C2 	1 	0.11642E-00 	0.12549E-02 ; semi repulsive
+  SNa 	AC2 	1 	0.11642E-00 	0.12549E-02 ; semi repulsive
+  SNa 	SC2 	1 	0.51203E-01 	0.32367E-03 ; 75semi repulsive s=0.43
+  SNa 	C1 	1 	0.11642E-00 	0.12549E-02 ; semi repulsive
+  SNa 	AC1 	1 	0.11642E-00 	0.12549E-02 ; semi repulsive
+  SNa 	SC1 	1 	0.51203E-01 	0.32367E-03 ; 75semi repulsive s=0.43
+  SNa 	Qda 	1 	0.21558E-00 	0.23238E-02 ; attractive 
+  SNa 	Qd 	1 	0.17246E-00 	0.18590E-02 ; semi attractive
+  SNa 	Qa 	1 	0.21558E-00 	0.23238E-02 ; attractive 
+  SNa 	Q0 	1 	0.17246E-00 	0.18590E-02 ; semi attractive
+  N0 	C5 	1 	0.15091E-00 	0.16267E-02 ; intermediate 
+  N0 	SC5 	1 	0.15091E-00 	0.16267E-02 ; intermediate 
+  N0 	C4 	1 	0.15091E-00 	0.16267E-02 ; intermediate 
+  N0 	SC4 	1 	0.15091E-00 	0.16267E-02 ; intermediate 
+  N0 	C3 	1 	0.15091E-00 	0.16267E-02 ; intermediate 
+  N0 	SC3 	1 	0.15091E-00 	0.16267E-02 ; intermediate 
+  N0 	C2 	1 	0.13366E-00 	0.14408E-02 ; almost intermediate 
+  N0 	AC2 	1 	0.13366E-00 	0.14408E-02 ; almost intermediate 
+  N0 	SC2 	1 	0.13366E-00 	0.14408E-02 ; almost intermediate 
+  N0 	C1 	1 	0.11642E-00 	0.12549E-02 ; semi repulsive
+  N0 	AC1 	1 	0.11642E-00 	0.12549E-02 ; semi repulsive
+  N0 	SC1 	1 	0.11642E-00 	0.12549E-02 ; semi repulsive
+  N0 	Qda 	1 	0.15091E-00 	0.16267E-02 ; intermediate 
+  N0 	Qd 	1 	0.15091E-00 	0.16267E-02 ; intermediate 
+  N0 	Qa 	1 	0.15091E-00 	0.16267E-02 ; intermediate 
+  N0 	Q0 	1 	0.15091E-00 	0.16267E-02 ; intermediate 
+  C5 	SC5 	1 	0.15091E-00 	0.16267E-02 ; intermediate 
+  C5 	C4 	1 	0.15091E-00 	0.16267E-02 ; intermediate 
+  C5 	SC4 	1 	0.15091E-00 	0.16267E-02 ; intermediate 
+  C5 	C3 	1 	0.15091E-00 	0.16267E-02 ; intermediate 
+  C5 	SC3 	1 	0.15091E-00 	0.16267E-02 ; intermediate 
+  C5 	C2 	1 	0.13366E-00 	0.14408E-02 ; almost intermediate 
+  C5 	AC2 	1 	0.13366E-00 	0.14408E-02 ; almost intermediate 
+  C5 	SC2 	1 	0.13366E-00 	0.14408E-02 ; almost intermediate 
+  C5 	C1 	1 	0.13366E-00 	0.14408E-02 ; almost intermediate 
+  C5 	AC1 	1 	0.13366E-00 	0.14408E-02 ; almost intermediate 
+  C5 	SC1 	1 	0.13366E-00 	0.14408E-02 ; almost intermediate 
+  C5 	Qda 	1 	0.13366E-00 	0.14408E-02 ; almost intermediate 
+  C5 	Qd 	1 	0.13366E-00 	0.14408E-02 ; almost intermediate 
+  C5 	Qa 	1 	0.13366E-00 	0.14408E-02 ; almost intermediate 
+  C5 	Q0 	1 	0.13366E-00 	0.14408E-02 ; almost intermediate 
+  SC5 	C4 	1 	0.15091E-00 	0.16267E-02 ; intermediate 
+  SC5 	SC4 	1 	0.66375E-01 	0.41957E-03 ; 75intermediate, s=0.43
+  SC5 	C3 	1 	0.15091E-00 	0.16267E-02 ; intermediate 
+  SC5 	SC3 	1 	0.66375E-01 	0.41957E-03 ; 75intermediate, s=0.43
+  SC5 	C2 	1 	0.13366E-00 	0.14408E-02 ; almost intermediate 
+  SC5 	AC2 	1 	0.13366E-00 	0.14408E-02 ; almost intermediate 
+  SC5 	SC2 	1 	0.58789E-01 	0.37162E-03 ; 75almost intermediate, s=0.43
+  SC5 	C1 	1 	0.13366E-00 	0.14408E-02 ; almost intermediate 
+  SC5 	AC1 	1 	0.13366E-00 	0.14408E-02 ; almost intermediate 
+  SC5 	SC1 	1 	0.58789E-01 	0.37162E-03 ; 75almost intermediate, s=0.43
+  SC5 	Qda 	1 	0.13366E-00 	0.14408E-02 ; almost intermediate 
+  SC5 	Qd 	1 	0.13366E-00 	0.14408E-02 ; almost intermediate 
+  SC5 	Qa 	1 	0.13366E-00 	0.14408E-02 ; almost intermediate 
+  SC5 	Q0 	1 	0.13366E-00 	0.14408E-02 ; almost intermediate 
+  C4 	SC4 	1 	0.15091E-00 	0.16267E-02 ; intermediate 
+  C4 	C3 	1 	0.15091E-00 	0.16267E-02 ; intermediate 
+  C4 	SC3 	1 	0.15091E-00 	0.16267E-02 ; intermediate 
+  C4 	C2 	1 	0.13366E-00 	0.14408E-02 ; almost intermediate 
+  C4 	AC2 	1 	0.13366E-00 	0.14408E-02 ; almost intermediate 
+  C4 	SC2 	1 	0.13366E-00 	0.14408E-02 ; almost intermediate 
+  C4 	C1 	1 	0.13366E-00 	0.14408E-02 ; almost intermediate 
+  C4 	AC1 	1 	0.13366E-00 	0.14408E-02 ; almost intermediate 
+  C4 	SC1 	1 	0.13366E-00 	0.14408E-02 ; almost intermediate 
+  C4 	Qda 	1 	0.11642E-00 	0.12549E-02 ; semi repulsive
+  C4 	Qd 	1 	0.11642E-00 	0.12549E-02 ; semi repulsive
+  C4 	Qa 	1 	0.11642E-00 	0.12549E-02 ; semi repulsive
+  C4 	Q0 	1 	0.11642E-00 	0.12549E-02 ; semi repulsive
+  SC4 	C3 	1 	0.15091E-00 	0.16267E-02 ; intermediate 
+  SC4 	SC3 	1 	0.66375E-01 	0.41957E-03 ; 75intermediate, s=0.43
+  SC4 	C2 	1 	0.13366E-00 	0.14408E-02 ; almost intermediate 
+  SC4 	AC2 	1 	0.13366E-00 	0.14408E-02 ; almost intermediate 
+  SC4 	SC2 	1 	0.58789E-01 	0.37162E-03 ; 75almost intermediate, s=0.43
+  SC4 	C1 	1 	0.13366E-00 	0.14408E-02 ; almost intermediate 
+  SC4 	AC1 	1 	0.13366E-00 	0.14408E-02 ; almost intermediate 
+  SC4 	SC1 	1 	0.58789E-01 	0.37162E-03 ; 75almost intermediate, s=0.43
+  SC4 	Qda 	1 	0.11642E-00 	0.12549E-02 ; semi repulsive
+  SC4 	Qd 	1 	0.11642E-00 	0.12549E-02 ; semi repulsive
+  SC4 	Qa 	1 	0.11642E-00 	0.12549E-02 ; semi repulsive
+  SC4 	Q0 	1 	0.11642E-00 	0.12549E-02 ; semi repulsive
+  C3 	SC3 	1 	0.15091E-00 	0.16267E-02 ; intermediate 
+  C3 	C2 	1 	0.15091E-00 	0.16267E-02 ; intermediate 
+  C3 	AC2 	1 	0.15091E-00 	0.16267E-02 ; intermediate 
+  C3 	SC2 	1 	0.15091E-00 	0.16267E-02 ; intermediate 
+  C3 	C1 	1 	0.15091E-00 	0.16267E-02 ; intermediate 
+  C3 	AC1 	1 	0.15091E-00 	0.16267E-02 ; intermediate 
+  C3 	SC1 	1 	0.15091E-00 	0.16267E-02 ; intermediate 
+  C3 	Qda 	1 	0.99167E-01 	0.10690E-02 ; almost repulsive 
+  C3 	Qd 	1 	0.99167E-01 	0.10690E-02 ; almost repulsive 
+  C3 	Qa 	1 	0.99167E-01 	0.10690E-02 ; almost repulsive 
+  C3 	Q0 	1 	0.99167E-01 	0.10690E-02 ; almost repulsive 
+  SC3 	C2 	1 	0.15091E-00 	0.16267E-02 ; intermediate 
+  SC3 	AC2 	1 	0.15091E-00 	0.16267E-02 ; intermediate 
+  SC3 	SC2 	1 	0.66375E-01 	0.41957E-03 ; 75intermediate, s=0.43
+  SC3 	C1 	1 	0.15091E-00 	0.16267E-02 ; intermediate 
+  SC3 	AC1 	1 	0.15091E-00 	0.16267E-02 ; intermediate 
+  SC3 	SC1 	1 	0.66375E-01 	0.41957E-03 ; 75intermediate, s=0.43
+  SC3 	Qda 	1 	0.99167E-01 	0.10690E-02 ; almost repulsive 
+  SC3 	Qd 	1 	0.99167E-01 	0.10690E-02 ; almost repulsive 
+  SC3 	Qa 	1 	0.99167E-01 	0.10690E-02 ; almost repulsive 
+  SC3 	Q0 	1 	0.99167E-01 	0.10690E-02 ; almost repulsive 
+  C2 	AC2 	1 	0.15091E-00 	0.16267E-02 ; intermediate 
+  C2 	SC2 	1 	0.15091E-00 	0.16267E-02 ; intermediate 
+  C2 	C1 	1 	0.15091E-00 	0.16267E-02 ; intermediate 
+  C2 	AC1 	1 	0.15091E-00 	0.16267E-02 ; intermediate 
+  C2 	SC1 	1 	0.15091E-00 	0.16267E-02 ; intermediate 
+  C2 	Qda 	1 	0.45440E-00 	0.25810E-01 ; super repulsive, s=0.62
+  C2 	Qd 	1 	0.45440E-00 	0.25810E-01 ; super repulsive, s=0.62
+  C2 	Qa 	1 	0.45440E-00 	0.25810E-01 ; super repulsive, s=0.62
+  C2 	Q0 	1 	0.45440E-00 	0.25810E-01 ; super repulsive, s=0.62
+  AC2 	SC2 	1 	0.15091E-00 	0.16267E-02 ; intermediate 
+  AC2 	C1 	1 	0.15091E-00 	0.16267E-02 ; intermediate 
+  AC2 	AC1 	1 	0.15091E-00 	0.16267E-02 ; intermediate 
+  AC2 	SC1 	1 	0.15091E-00 	0.16267E-02 ; intermediate 
+  AC2 	Qda 	1 	0.86233E-01 	0.92953E-03 ; repulsive 
+  AC2 	Qd  	1 	0.86233E-01 	0.92953E-03 ; repulsive 
+  AC2 	Qa  	1 	0.86233E-01 	0.92953E-03 ; repulsive 
+  AC2 	Q0  	1 	0.86233E-01 	0.92953E-03 ; repulsive 
+  SC2 	C1 	1 	0.15091E-00 	0.16267E-02 ; intermediate 
+  SC2 	AC1 	1 	0.15091E-00 	0.16267E-02 ; intermediate 
+  SC2 	SC1 	1 	0.66375E-01 	0.41957E-03 ; 75intermediate, s=0.43
+  SC2 	Qda 	1 	0.45440E-00 	0.25810E-01 ; super repulsive, s=0.62
+  SC2 	Qd 	1 	0.45440E-00 	0.25810E-01 ; super repulsive, s=0.62
+  SC2 	Qa 	1 	0.45440E-00 	0.25810E-01 ; super repulsive, s=0.62
+  SC2 	Q0 	1 	0.45440E-00 	0.25810E-01 ; super repulsive, s=0.62
+  C1 	AC1 	1 	0.15091E-00 	0.16267E-02 ; intermediate 
+  C1 	SC1 	1 	0.15091E-00 	0.16267E-02 ; intermediate 
+  C1 	Qda 	1 	0.45440E-00 	0.25810E-01 ; super repulsive, s=0.62
+  C1 	Qd 	1 	0.45440E-00 	0.25810E-01 ; super repulsive, s=0.62
+  C1 	Qa 	1 	0.45440E-00 	0.25810E-01 ; super repulsive, s=0.62
+  C1 	Q0 	1 	0.45440E-00 	0.25810E-01 ; super repulsive, s=0.62
+  AC1 	SC1 	1 	0.15091E-00 	0.16267E-02 ; intermediate 
+  AC1 	Qda 	1 	0.86233E-01 	0.92953E-03 ; repulsive 
+  AC1 	Qd  	1 	0.86233E-01 	0.92953E-03 ; repulsive 
+  AC1 	Qa  	1 	0.86233E-01 	0.92953E-03 ; repulsive 
+  AC1 	Q0  	1 	0.86233E-01 	0.92953E-03 ; repulsive 
+  SC1 	Qda 	1 	0.45440E-00 	0.25810E-01 ; super repulsive, s=0.62
+  SC1 	Qd 	1 	0.45440E-00 	0.25810E-01 ; super repulsive, s=0.62
+  SC1 	Qa 	1 	0.45440E-00 	0.25810E-01 ; super repulsive, s=0.62
+  SC1 	Q0 	1 	0.45440E-00 	0.25810E-01 ; super repulsive, s=0.62
+  Qda 	Qd 	1 	0.24145E-00 	0.26027E-02 ; supra attractive
+  Qda 	Qa 	1 	0.24145E-00 	0.26027E-02 ; supra attractive
+  Qda 	Q0 	1 	0.19402E-00 	0.20914E-02 ; almost attractive
+  Qd 	Qa 	1 	0.24145E-00 	0.26027E-02 ; supra attractive
+  Qd 	Q0 	1 	0.19402E-00 	0.20914E-02 ; almost attractive
+  Qa 	Q0 	1 	0.19402E-00 	0.20914E-02 ; almost attractive
+
+
+  
+;;;;;; WATER (representing 4 H2O molecules)
+
+[ moleculetype ]
+; molname  	nrexcl
+  W 	    	1
+
+[ atoms ]
+;id 	type 	resnr 	residu 	atom 	cgnr 	charge
+ 1 	P4 	1 	W 	W 	1 	0 
+
+;;;;;; ANTIFREEZE (prevents freezing of water)
+
+[ moleculetype ]
+; molname 	 nrexcl
+  WF	   	 1
+                                                                                
+[ atoms ]
+;id 	type 	resnr 	residu 	atom 	cgnr 	charge
+ 1 	BP4 	1 	WF	WF	1 	0
+
+
+;;;;;; AMINO ACIDS -- PRELIMINARY RELEASE, COMPATIBLE WITH MARTINI V2.0
+;
+; S.J. Marrink, 30-11-2007.
+;
+; please cite:
+;
+; L. Monticelli, S. Kandasamy, X. Periole, R. Larson, D.P. Tieleman, S.J. Marrink.
+; The MARTINI forcefield: Extension to peptides and proteins.
+; Submitted, 2007.
+;
+;
+; BACKBONE
+; the backbone of the amino acids consist of one particle, which represents
+; the center-of-mass of the NH2-Calpha-C=O unit. 
+; For a single aminoacid, the backbone is very polar
+; and is represented by a "P5" particle.
+
+; However: as part of a secondary structure element inside a peptide or
+; protein a particle type of reduced polarity should be used. For details
+; see the original publications.
+
+; SIDECHAIN GEOMETRY
+; most amino acids except GLY and ALA have at least one site representing
+; the side chain. The backbone-sidechain distance was estimated from 
+; the underlying atomistic structure and thus reflects the size of the 
+; amino acid quite accurately. Most side chains are attached to the
+; backbone with weak bonds to mimic flexibility of the underlying structure.
+; A few attachments are stiffer and are modeled by constraints.
+
+
+;;; GLYCINE
+
+[ moleculetype ]
+; molname       nrexcl
+GLY                1			
+
+[ atoms ]
+;id type resnr residu atom cgnr   charge
+ 1   P5   1     GLY    BAS    1      0      
+
+
+;;; ALANINE
+
+[ moleculetype ]
+; molname       nrexcl
+ALA                1
+
+[ atoms ]
+;id type resnr residu atom cgnr   charge
+ 1   P4    1     ALA    BAS    1      0     ; ALA slightly less polar 
+
+
+;;; CYSTEINE
+
+[ moleculetype ]
+; molname       nrexcl
+CYS                1
+
+[ atoms ]
+;id type resnr residu atom cgnr   charge
+ 1   P5     1   CYS    BAS    1      0
+ 2   C5     1   CYS    SID    2      0     
+
+[bonds]
+;  i     j   funct   length  force.c.
+   1     2    1       0.31     7500        
+
+;;; FARNESYLATED CYS
+
+[moleculetype]
+;molname	exclusions
+FAR	1
+
+[atoms]
+1      Na       1       FAR     BCNa    1       0.000   
+2      C5       1       FAR     SCC5    2       0.000   
+3      C4       2       FAR     SCC4    3       0.000
+4      C4       2       FAR     SCC4    4       0.000
+5      C4       2       FAR     SCC4    5       0.000
+
+[ bonds ]
+1	2	1	0.310	7500	;	CYS
+2       3      1       0.390   5000
+3       4      1       0.410   8000
+4       5      1       0.410   8000
+
+[ constraints ]
+
+[angles]
+1      2      3      1       100.00  25
+3      4      5      1       110.00  15
+
+;;; VALINE
+
+[ moleculetype ]
+; molname       nrexcl
+VAL                1
+
+[ atoms ]
+;id type resnr residu atom cgnr   charge
+ 1   P5   1     VAL     BAS    1      0    
+ 2   AC2  1     VAL     SID    2      0    
+
+[constraints]
+;  i     j   funct   length  
+   1     2    1       0.265       
+
+
+;;; LEUCINE
+
+[ moleculetype ]
+; molname       nrexcl
+LEU                1
+
+[ atoms ]
+;id type resnr residu atom cgnr   charge
+ 1   P5   1     LEU     BAS    1      0    
+ 2   AC1  1     LEU     SID    2      0    
+
+[bonds]
+;  i     j   funct   length  force.c.
+   1     2    1       0.33     7500    
+
+
+;;; ISOLEUCINE
+
+[ moleculetype ]
+; molname       nrexcl
+ILE                1
+
+[ atoms ]
+;id type resnr residu atom cgnr   charge
+ 1   P5   1     ILE     BAS    1      0    
+ 2   AC1  1     ILE     SID    2      0    
+
+[constraints]
+;  i     j   funct   length  
+   1     2    1       0.31       
+
+
+;;; METHIONINE
+
+[ moleculetype ]
+; molname       nrexcl
+MET                1
+
+[ atoms ]
+;id type resnr residu atom cgnr   charge
+ 1   P5   1     MET     BAS    1      0    
+ 2   C5   1     MET     SID    2      0     
+
+[bonds]
+;  i     j   funct   length  force.c.
+   1     2    1       0.40     2500
+
+
+;;; PROLINE
+
+[ moleculetype ]
+; molname       nrexcl
+PRO                1
+
+[ atoms ]
+;id type resnr residu atom cgnr   charge
+ 1   P5   1     PRO     BAS    1      0    
+ 2   AC2  1     PRO     SID    2      0    
+
+[bonds]
+;  i     j   funct   length  force.c.
+  1     2    1       0.30     7500
+
+
+;;; ASPARAGINE
+
+[ moleculetype ]
+; molname       nrexcl
+ASN                1
+
+[ atoms ]
+;id type resnr residu atom cgnr   charge
+ 1   P5    1     ASN     BAS    1      0    
+ 2   P5    1     ASN     SID    2      0    
+
+[bonds]
+;  i     j   funct   length  force.c.
+   1     2    1       0.32     5000
+
+
+;;; GLUTAMINE
+
+[ moleculetype ]
+; molname       nrexcl
+GLN                1
+
+[ atoms ]
+;id type resnr residu atom cgnr   charge
+ 1   P5    1     GLN     BAS    1      0    
+ 2   P4    1     GLN     SID    2      0    
+
+[bonds]
+;  i     j   funct   length  force.c.
+   1     2    1       0.40     5000     
+
+
+;;; ASPARTATE
+
+[ moleculetype ]
+; molname       nrexcl
+ASP                1
+
+[ atoms ]
+;id type resnr residu atom cgnr   charge
+ 1   P5     1     ASP     BAS    1      0    
+ 2   Qa     1     ASP     SID    2   -1.0    
+
+[bonds]
+;  i     j   funct   length  force.c.
+   1     2    1       0.32     7500
+
+
+;;; ASPARTATE - NEUTRAL FORM
+
+[ moleculetype ]
+; molname       nrexcl
+ASP0               1
+
+[ atoms ]
+;id type resnr residu atom cgnr   charge
+ 1   P5     1     ASP0    BAS    1      0    
+ 2   P3     1     ASP0    SID    2      0    
+
+[bonds]
+;  i     j   funct   length  force.c.
+   1     2    1       0.32     7500
+
+
+;;; GLUTAMATE
+
+[ moleculetype ]
+; molname       nrexcl
+GLU                1
+
+[ atoms ]
+;id type resnr residu atom cgnr   charge
+ 1   P5     1     GLU     BAS    1      0    
+ 2   Qa     1     GLU     SID    2   -1.0    
+
+[bonds]
+;  i     j   funct   length  force.c.
+   1     2    1       0.40     5000     
+
+
+;;; GLUTAMATE - NEUTRAl FORM
+
+[ moleculetype ]
+; molname       nrexcl
+GLU0               1
+
+[ atoms ]
+;id type resnr residu atom cgnr   charge
+ 1   P5     1     GLU0    BAS    1      0    
+ 2   P1     1     GLU0    SID    2      0    
+
+[bonds]
+;  i     j   funct   length  force.c.
+   1     2    1       0.40     5000    
+
+
+;;; THREONINE
+
+[ moleculetype ]
+; molname       nrexcl
+THR                1
+
+[ atoms ]
+;id type resnr residu atom cgnr   charge
+1   P5     1     THR     BAS    1      0    
+2   P1     1     THR     SID    2      0    
+
+[constraints]
+;  i     j   funct   length 
+   1     2    1       0.26   
+
+
+;;; SERINE
+
+[ moleculetype ]
+; molname       nrexcl
+SER                1
+
+[ atoms ]
+;id type resnr residu atom cgnr   charge
+1   P5     1    SER     BAS    1      0    
+2   P1     1    SER     SID    2      0    
+
+[bonds]
+;  i     j   funct   length  force.c.
+   1     2    1       0.25     7500
+
+
+;;; LYSINE 
+
+[ moleculetype ]
+; molname       nrexcl
+LYS                1
+
+[ atoms ]
+;id type resnr residu atom cgnr   charge
+ 1   P5    1     LYS     BAS    1      0    
+ 2   C3    1     LYS     SI1    2      0    
+ 3   Qd    1     LYS     SI2    3    1.0    
+
+[bonds]
+;  i     j   funct   length  force.c.
+   1     2    1       0.33     5000      
+   2     3    1       0.28     5000  
+
+[angles]
+;  i     j    k     funct   angle  force.c.
+    1     2    3       2   180.000    25.0      
+
+
+;;; LYSINE - NEUTRAL FORM
+
+[ moleculetype ]
+; molname       nrexcl
+LYS0               1
+
+[ atoms ]
+;id type resnr residu atom cgnr   charge
+ 1   P5    1     LYS     BAS    1      0    
+ 2   C3    1     LYS     SI1    2      0    
+ 3   P1    1     LYS     SI2    3      0    
+
+[bonds]
+;  i     j   funct   length  force.c.
+   1     2    1       0.33     5000      
+   2     3    1       0.28     5000  
+
+[angles]
+;  i     j    k     funct   angle  force.c.
+    1     2    3       2   180.000    25.0      
+
+
+;;; ARGININE 
+
+[ moleculetype ]
+; molname       nrexcl
+ARG                1
+
+[ atoms ]
+;id type resnr residu atom cgnr   charge
+1   P5     1     ARG     BAS    1      0    
+2   N0     1     ARG     SI1    2      0    
+3   Qd     1     ARG     SI2    3    1.0    
+
+[bonds]
+;  i     j   funct   length  force.c.
+   1     2    1       0.33     5000   
+   2     3    1       0.34     5000  
+
+[angles]
+;  i     j    k     funct   angle  force.c.
+    1     2    3       2   180.000    25.0      
+
+
+;; ARGININE - NEUTRAL FORM
+
+[ moleculetype ]
+; molname       nrexcl
+ARG0               1
+
+[ atoms ]
+;id type resnr residu atom cgnr   charge
+1   P5     1     ARG0    BAS    1      0    
+2   N0     1     ARG0    SI1    2      0    
+3   P4     1     ARG0    SI2    3      0    
+
+[bonds]
+;  i     j   funct   length  force.c.
+   1     2    1       0.33     5000       
+   2     3    1       0.34     5000     
+
+[angles]
+;  i     j    k     funct   angle  force.c.
+    1     2    3       2   180.000    25.0      
+
+
+;;; HISTIDINE 
+
+[ moleculetype ]
+;molname       nrexcl
+HIS                1
+
+[ atoms ]
+;id type resnr residu atom cgnr   charge
+1   P5     1     HIS     BAS    1      0    
+2   SC4    1     HIS     SI1    2    0    ; three side chains in triangle
+3   SP1    1     HIS     SI2    3    0    ; configuration, mimicking
+4   SP1    1     HIS     SI3    4    0    ; ring structure
+
+[bonds]
+;  i     j   funct   length  force.c.
+   1     2    1       0.32     7500 
+
+[constraints]
+;  i     j   funct   length  
+   2     3    1       0.27    
+   2     4    1       0.27   
+   3     4    1       0.27  
+
+[angles]
+;  i     j    k     funct   angle  force.c.
+    1     2    3       2   150.000   50.0  
+    1     2    4       2   150.000   50.0 
+
+[dihedrals]
+;  i     j    k    l   funct   angle  force.c.
+   1     3    4    2       2    0.0    50.0     ; to prevent backflipping of ring
+
+;;; PHENYLALANINE
+
+[ moleculetype ]
+; molname       nrexcl
+PHE                1
+
+[ atoms ]
+;id type resnr residu atom cgnr   charge
+1   P5     1     PHE     BAS    1    0
+2   SC4    1     PHE     SI1    2    0    ; three side chains in triangle
+3   SC4    1     PHE     SI2    3    0    ; configuration, mimicking
+4   SC4    1     PHE     SI3    4    0    ; ring structure
+
+[bonds]
+;  i     j   funct   length  force.c.
+   1     2    1       0.31     7500 	
+
+[constraints]
+;  i     j   funct   length  
+   2     3    1       0.27     
+   2     4    1       0.27    
+   3     4    1       0.27   
+
+[angles]
+;  i     j    k     funct   angle  force.c.
+    1     2    3       2   150.000   50.0  
+    1     2    4       2   150.000   50.0 
+
+[dihedrals]
+;  i     j    k    l   funct   angle  force.c.
+   1     3    4    2       2    0.0    50.0     ; to prevent backflipping of ring
+
+
+;;; TYROSINE
+
+[ moleculetype ]
+; molname       nrexcl
+TYR                1
+
+[ atoms ]
+;id type resnr residu atom cgnr   charge
+1   P5     1     TYR     BAS    1    0
+2   SC4    1     TYR     SI1    2    0  
+3   SC4    1     TYR     SI2    3    0 
+4   SP1    1     TYR     SI3    4    0  
+
+[bonds]
+;  i     j   funct   length  force.c.
+   1     2    1       0.32     5000 	
+
+[constraints]
+;  i     j   funct   length  
+   2     3    1       0.27     
+   2     4    1       0.27    
+   3     4    1       0.27   
+
+[angles]
+;  i     j    k     funct   angle  force.c.
+    1     2    3       2   150.000   50.0  
+    1     2    4       2   150.000   50.0 
+
+[dihedrals]
+;  i     j    k    l   funct   angle  force.c.
+   1     3    4    2       2    0.0    50.0     ; to prevent backflipping of ring
+
+
+;;; TRYPTOPHAN
+
+[ moleculetype ]
+;molname       nrexcl
+TRP                1
+
+[ atoms ]
+;id type resnr residu atom cgnr   charge
+1   P5       1     TRP     BAS    1    0
+2   SC4      1     TRP     SI1    2    0    
+3   SP1      1     TRP     SI2    3    0
+4   SC4      1     TRP     SI3    4    0
+5   SC4      1     TRP     SI3    4    0
+
+[bonds]
+;  i     j   funct   length  force.c.
+   1     2    1       0.30     5000 	
+
+[constraints]
+;  i     j   funct   length  
+   2     3    1       0.27     
+   3     4    1       0.27    
+   2     4    1       0.27   
+   3     5    1       0.27    
+   4     5    1       0.27   
+
+[angles]
+;  i     j    k     funct   angle  force.c.
+   1     2    3       2   210.000   50.0 
+   1     2    4       2   90.000    50.0  
+
+[dihedrals]
+;  i     j    k    l   funct   angle  force.c.
+   1     3    4    2       2    0.0    50.0     ; to prevent backflipping of ring
+   2     3    5    4       2    0.0    200.0    ; to keep plane fixed
+
+;;;;;; TOPOLOGIES FOR LIPIDS
+;
+; lipids are defined here as double tail amphipatic  molecules
+;
+; currently available:
+
+;;;;;; COMMON PCs: DPPC, DHPC, DLPC (DMPC), DSPC, POPC, DOPC, DAPC
+;;;;;; COMMON PEs: DPPE, DHPE, DLPE (DMPE), DSPE, POPE, DOPE
+;;;;;; SPHINGOLIPIDS: PPCS
+
+; For more background on the testing and optimization of the parameters,
+; please see the following refs:
+
+; S.J. Marrink, A.H. de Vries, A.E. Mark.
+; Coarse grained model for semi-quantitative lipid simulations.
+; JPC-B, 108:750-760, 2004.
+
+; and for poly-unsaturated lipids:
+
+;  S.J. Marrink, A.H. de Vries, T.A. Harroun, J. Katsaras, S.R. Wassall.
+;  Cholesterol shows preference for the interior of polyunsaturated lipid membranes.
+;  JACS, in press, 2007.
+
+
+;;;;;;
+;;;;;; COMMON PCs
+;;;;;;
+
+;;;;;; DIPALMITOYL PHOSPHATIDYLCHOLINE  
+;
+; in general models PCs with saturated tail lengths C15-18
+
+[moleculetype]
+; molname 	nrexcl
+  DPPC 		1
+
+[atoms]
+; id 	type 	resnr 	residu 	atom 	cgnr 	charge
+  1 	Q0 	1 	DPPC 	NC3 	1 	1.0 
+  2 	Qa 	1 	DPPC 	PO4 	2 	-1.0 
+  3 	Na 	1 	DPPC 	GL1 	3 	0 
+  4 	Na 	1 	DPPC 	GL2 	4 	0 
+  5 	C1 	1 	DPPC 	C1A 	5 	0 
+  6 	C1 	1 	DPPC 	C2A 	6 	0 
+  7 	C1 	1 	DPPC 	C3A 	7 	0 
+  8 	C1 	1 	DPPC 	C4A 	8 	0 
+  9 	C1 	1 	DPPC 	C1B 	9 	0 
+  10 	C1 	1 	DPPC 	C2B 	10 	0 
+  11 	C1 	1 	DPPC 	C3B 	11 	0 
+  12 	C1 	1 	DPPC 	C4B 	12 	0 
+
+[bonds]
+; i j 	funct 	length 	force.c.
+  1 2 	1 	0.470 	1250
+  2 3 	1 	0.470 	1250
+  3 4 	1 	0.370 	1250
+  3 5 	1 	0.470 	1250
+  5 6 	1 	0.470 	1250
+  6 7 	1 	0.470 	1250
+  7 8 	1 	0.470 	1250
+  4 9 	1 	0.470 	1250
+  9 10 	1 	0.470 	1250
+  10 11 1 	0.470 	1250
+  11 12 1 	0.470 	1250
+
+[angles]
+; i j k 	funct 	angle 	force.c.
+  2 3 4 	2 	120.0 	25.0 
+  2 3 5 	2 	180.0 	25.0 
+  3 5 6 	2 	180.0 	25.0 
+  5 6 7 	2 	180.0 	25.0 
+  6 7 8 	2 	180.0 	25.0 
+  4 9 10 	2 	180.0 	25.0 
+  9 10 11 	2 	180.0 	25.0 
+ 10 11 12 	2 	180.0 	25.0 
+
+
+;;;;;; DIHEXANOYL PHOSPHATIDYLCHOLINE
+;
+; in general models PCs with saturated tail lengths C8-11
+
+[moleculetype]
+; molname 	nrexcl
+DHPC 1
+
+[atoms]
+; id 	type 	resnr 	residu 	atom 	cgnr 	charge
+  1 	Q0 	1 	DHPC 	NC3 	1 	1.0 
+  2 	Qa 	1 	DHPC  	PO4 	2 	-1.0 
+  3 	Na 	1 	DHPC 	GL1 	3 	0 
+  4 	Na 	1 	DHPC 	GL2 	4 	0 
+  5 	C1 	1 	DHPC 	C1A 	5 	0 
+  6 	C1 	1 	DHPC 	C2A 	6 	0 
+  7 	C1 	1 	DHPC 	C1B 	7 	0 
+  8 	C1 	1 	DHPC 	C2B 	8 	0 
+
+[bonds]
+; i j 	funct 	length 	force.c.
+  1 2 	1 	0.470 	1250
+  2 3 	1 	0.470 	1250
+  3 4 	1 	0.370 	1250
+  3 5 	1 	0.470 	1250
+  5 6 	1 	0.470 	1250
+  4 7 	1 	0.470 	1250
+  7 8 	1 	0.470 	1250
+
+[angles]
+; i j k 	funct 	angle 	force.c.
+  2 3 4 	2 	120.0 	25.0 
+  2 3 5 	2 	180.0 	25.0 
+  3 5 6 	2 	180.0 	25.0 
+  4 7 8 	2 	180.0 	25.0 
+
+;;;;;; DILAUROYL PHOSPHATIDYLCHOLINE 
+;
+; in general models PCs with saturated tail lengths C12-15, including DMPC
+
+[moleculetype]
+; molname 	nrexcl
+  DLPC 		1
+
+[atoms]
+; id 	type 	resnr 	residu 	atom 	cgnr 	charge
+   1 	Q0 	1 	DLPC 	NC3 	1 	1.0
+   2 	Qa 	1 	DLPC  	PO4 	2 	-1.0
+   3 	Na 	1 	DLPC 	GL1 	3 	0
+   4 	Na 	1 	DLPC 	GL2 	4 	0
+   5 	C1 	1 	DLPC 	C1A 	5 	0
+   6 	C1 	1 	DLPC 	C2A 	6 	0
+   7 	C1 	1 	DLPC 	C3A 	7 	0
+   8 	C1 	1 	DLPC 	C1B 	8 	0
+   9 	C1 	1 	DLPC 	C2B 	9 	0
+   10 	C1 	1 	DLPC 	C3B 	10 	0
+
+[bonds]
+; i j 	funct 	length 	force.c.
+  1 2 	1 	0.47 	1250
+  2 3 	1 	0.47 	1250
+  3 4 	1 	0.37 	1250
+  3 5 	1 	0.47 	1250
+  5 6 	1 	0.47 	1250
+  6 7 	1 	0.47 	1250
+  4 8 	1 	0.47 	1250
+  8 9 	1 	0.47 	1250
+  9 10 	1 	0.47 	1250
+
+[angles]
+; i j k 	funct 	angle 	force.c.
+  2 3 4 	2 	120.0 	25.0 
+  2 3 5 	2 	180.0 	25.0 
+  3 5 6 	2 	180.0 	25.0
+  5 6 7 	2 	180.0 	25.0
+  4 8 9 	2 	180.0 	25.0
+  8 9 10 	2 	180.0 	25.0
+
+;;;;;; DISTEAROYL PHOSPHATIDYLCHOLINE
+;
+; in general models PCs with saturated tail lengths C18-21
+
+[moleculetype]
+; molname 	nrexcl
+  DSPC 		1
+
+[atoms]
+; id 	type 	resnr 	residu 	atom 	cgnr 	charge
+  1 	Q0 	1 	DSPC 	NC3 	1 	1.0 
+  2 	Qa 	1 	DSPC  	PO4 	2 	-1.0 
+  3 	Na 	1 	DSPC 	GL1 	3 	0 
+  4 	Na 	1 	DSPC 	GL2 	4 	0 
+  5 	C1 	1 	DSPC 	C1A 	5 	0 
+  6 	C1 	1 	DSPC 	C2A 	6 	0 
+  7 	C1 	1 	DSPC 	C3A 	7 	0 
+  8 	C1 	1 	DSPC 	C4A 	8 	0 
+  9 	C1 	1 	DSPC 	C5A 	9 	0 
+  10 	C1 	1 	DSPC 	C1B 	10 	0 
+  11 	C1 	1 	DSPC 	C2B 	11 	0 
+  12 	C1 	1 	DSPC 	C3B 	12 	0	 
+  13 	C1 	1 	DSPC 	C4B 	13 	0 
+  14 	C1 	1 	DSPC 	C5B 	14 	0 
+
+[bonds]
+; i j 	funct 	length 	force.c.
+  1 2 	1 	0.47 	1250
+  2 3 	1 	0.47 	1250
+  3 4 	1 	0.37 	1250
+  3 5 	1 	0.47 	1250
+  5 6 	1 	0.47 	1250
+  6 7 	1 	0.47 	1250
+  7 8 	1 	0.47 	1250
+  8 9 	1 	0.47 	1250
+  4 10 	1 	0.47 	1250
+  10 11 1 	0.47 	1250
+  11 12 1 	0.47 	1250
+  12 13 1 	0.47 	1250
+  13 14 1 	0.47 	1250
+
+[angles]
+; i j k 	funct 	angle 	force.c.
+  2 3 4 	2 	120.0 	25.0 
+  2 3 5 	2 	180.0 	25.0 
+  3 5 6 	2 	180.0 	25.0 
+  5 6 7 	2 	180.0 	25.0 
+  6 7 8 	2 	180.0 	25.0 
+  7 8 9 	2 	180.0 	25.0 
+  4 10 11 	2 	180.0 	25.0 
+  10 11 12 	2 	180.0 	25.0 
+  11 12 13 	2 	180.0 	25.0 
+  12 13 14 	2 	180.0 	25.0 
+
+
+;;;;;; PALMITOYL OLEOYL PHOSPHATIDYLCHOLINE
+
+[moleculetype]
+; molname 	nrexcl
+  POPC 1
+
+[atoms]
+; id 	type 	resnr 	residu 	atom 	cgnr 	charge
+  1 	Q0 	1  	POPC 	NC3 	1 	1.0 
+  2 	Qa 	1  	POPC 	PO4 	2 	-1.0 
+  3 	Na 	1  	POPC 	GL1 	3 	0 
+  4 	Na 	1  	POPC 	GL2 	4 	0 
+  5 	C1 	1  	POPC 	C1A 	5 	0 
+  6 	C1 	1  	POPC 	C2A 	6 	0 
+  7 	C1 	1  	POPC 	C3A 	7 	0 
+  8 	C1 	1  	POPC 	C4A 	8 	0 
+  9 	C1 	1  	POPC 	C1B 	9 	0 
+  10 	C1 	1  	POPC 	C2B 	10 	0 
+  11 	C3 	1  	POPC 	D3B 	11 	0 
+  12 	C1 	1  	POPC 	C4B 	12 	0 
+  13 	C1 	1  	POPC 	C5B 	13 	0 
+
+[bonds]
+; i j 	funct 	length 	force.c.
+  1 2 	1 	0.47 	1250
+  2 3 	1 	0.47 	1250
+  3 4 	1 	0.37 	1250
+  4 5 	1 	0.47 	1250
+  5 6 	1 	0.47 	1250
+  6 7 	1 	0.47 	1250
+  7 8 	1 	0.47 	1250
+  3 9 	1 	0.47 	1250
+  9 10 	1 	0.47 	1250
+  10 11 1 	0.47 	1250
+  11 12 1 	0.47 	1250
+  12 13 1 	0.47 	1250
+
+[angles]
+; i j k 	funct 	angle 	force.c.
+  2 3 4 	2 	120.0 	25.0 
+  2 3 9 	2 	180.0 	25.0 
+  4 5 6 	2 	180.0 	25.0 
+  5 6 7 	2 	180.0 	25.0 
+  6 7 8 	2 	180.0 	25.0 
+  3 9 10 	2 	180.0 	25.0 
+  9 10 11 	2 	180.0 	25.0 
+  10 11 12 	2 	120.0 	45.0 
+  11 12 13 	2 	180.0 	25.0 
+
+
+;;;;;; PALMITOYL OLEOYL PHOSPHATIDYLGLYCEROL
+
+[ moleculetype ]
+; molname       nrexcl
+POPG                1
+
+[ atoms ]
+;id type resnr residu atom cgnr   charge
+ 1   Nda  1     POPG     GLH    1      0    
+ 2   Qa   1     POPG     PO4    2     -1.0    
+ 3   Na   1     POPG     GL1    3      0    
+ 4   Na   1     POPG     GL2    4      0    
+ 5   C1   1     POPG     C1A    5      0    
+ 6   C1   1     POPG     C2A    6      0    
+ 7   C1   1     POPG     C3A    7      0    
+ 8   C1   1     POPG     C4A    8      0    
+ 9   C1   1     POPG     C1B    9      0    
+ 10  C1   1     POPG     C2B    10      0    
+ 11  C3   1     POPG     D3B    11      0    
+ 12  C1   1     POPG     C4B    12      0    
+ 13  C1   1     POPG     C5B    13      0    
+
+[bonds]
+;  i     j   funct   length  force.c.
+   1     2    1       0.47     1250
+   2     3    1       0.47     1250
+   3     4    1       0.47     1250
+   4     5    1       0.47     1250
+   5     6    1       0.47     1250
+   6     7    1       0.47     1250
+   7     8    1       0.47     1250
+   3     9    1       0.47     1250
+   9     10   1       0.47     1250
+   10    11   1       0.47     1250
+   11    12   1       0.47     1250
+   12    13   1       0.47     1250
+
+[angles]
+;  i     j    k     funct   angle  force.c.
+    2     3    4       2    120.000   25.0 
+    2     3    9       2    180.000   25.0 
+   4     5    6       2   180.000  25.0 
+   5     6    7       2   180.000  25.0 
+   6     7    8       2   180.000  25.0 
+   3     9   10       2   180.000  25.0 
+   9    10   11       2   180.000  25.0 
+  10    11   12       2   120.000  35.0 
+  11    12   13       2   180.000  25.0 
+
+;;;;;; PALMITOYL OLEOYL PHOSPHATIDYLGLYCEROL
+
+[ moleculetype ]
+; molname       nrexcl
+PVPG                1
+
+[ atoms ]
+;id type resnr residu atom cgnr   charge
+ 1   Nda  1     PVPG     GLH    1      0    
+ 2   Qa   1     PVPG     PO4    2     -1.0    
+ 3   Na   1     PVPG     GL1    3      0    
+ 4   Na   1     PVPG     GL2    4      0    
+ 5   C1   1     PVPG     C1A    5      0    
+ 6   C1   1     PVPG     C2A    6      0    
+ 7   C1   1     PVPG     C3A    7      0    
+ 8   C1   1     PVPG     C4A    8      0    
+ 9   C1   1     PVPG     C1B    9      0    
+ 10  C1   1     PVPG     C2B    10      0    
+ 11  C3   1     PVPG     D3B    11      0    
+ 12  C1   1     PVPG     C4B    12      0    
+ 13  C1   1     PVPG     C5B    13      0    
+
+[bonds]
+;  i     j   funct   length  force.c.
+   1     2    1       0.47     1250
+   2     3    1       0.47     1250
+   3     4    1       0.47     1250
+   4     5    1       0.47     1250
+   5     6    1       0.47     1250
+   6     7    1       0.47     1250
+   7     8    1       0.47     1250
+   3     9    1       0.47     1250
+   9     10   1       0.47     1250
+   10    11   1       0.47     1250
+   11    12   1       0.47     1250
+   12    13   1       0.47     1250
+
+[angles]
+;  i     j    k     funct   angle  force.c.
+    2     3    4       2    120.000   25.0 
+    2     3    9       2    180.000   25.0 
+   4     5    6       2   180.000  25.0 
+   5     6    7       2   180.000  25.0 
+   6     7    8       2   180.000  25.0 
+   3     9   10       2   180.000  25.0 
+   9    10   11       2   180.000  25.0 
+  10    11   12       2   120.000  35.0 
+  11    12   13       2   180.000  25.0 
+
+;;;;;; PALMITOYL VACCENYL PHOSPHATE
+
+[ moleculetype ]
+; molname       nrexcl
+PVPA                1
+
+[ atoms ]
+;id type resnr residu atom cgnr   charge
+ 1   Qa   1     PVPA     PO3    1     -2.0    
+ 2   Na   1     PVPA     GL1    2      0    
+ 3   Na   1     PVPA     GL2    3      0    
+ 4   C1   1     PVPA     C1A    4      0    
+ 5   C1   1     PVPA     C2A    5      0    
+ 6   C1   1     PVPA     C3A    6      0    
+ 7   C1   1     PVPA     C4A    7      0    
+ 8   C1   1     PVPA     C1B    8      0    
+ 9   C1   1     PVPA     C2B    9      0    
+ 10  C3   1     PVPA     D3B    10      0    
+ 11  C1   1     PVPA     C4B    11      0    
+ 12  C1   1     PVPA     C5B    12      0    
+
+[bonds]
+;  i     j   funct   length  force.c.
+   1     2    1       0.47     1250
+   2     3    1       0.47     1250
+   3     4    1       0.47     1250
+   4     5    1       0.47     1250
+   5     6    1       0.47     1250
+   6     7    1       0.47     1250
+   2     8    1       0.47     1250
+   8     9    1       0.47     1250 
+   9     10   1       0.47     1250
+   10    11   1       0.47     1250
+   11    12   1       0.47     1250
+ 
+[angles]
+;  i     j    k     funct   angle  force.c.
+    1     2    3       2    120.000   25.0 
+    1     2    8       2    180.000   25.0 
+    3     4    5       2   180.000  25.0 
+    4     5    6       2   180.000  25.0 
+    5     6    7       2   180.000  25.0
+   2     8     9       2   180.000  25.0 
+   8     9    10       2   180.000  25.0 
+   9    10    11       2   120.000  35.0 
+  10    11    12       2   180.000  25.0 
+
+;;;;;; PALMITOYL OLEOYL PHOSPHATE
+
+[ moleculetype ]
+; molname       nrexcl
+POPA                1
+
+[ atoms ]
+;id type resnr residu atom cgnr   charge
+ 1   Qa   1     POPA     PO3    1     -2.0    
+ 2   Na   1     POPA     GL1    2      0    
+ 3   Na   1     POPA     GL2    3      0    
+ 4   C1   1     POPA     C1A    4      0    
+ 5   C1   1     POPA     C2A    5      0    
+ 6   C1   1     POPA     C3A    6      0    
+ 7   C1   1     POPA     C4A    7      0    
+ 8   C1   1     POPA     C1B    8      0    
+ 9   C1   1     POPA     C2B    9      0    
+ 10  C3   1     POPA     D3B    10      0    
+ 11  C1   1     POPA     C4B    11      0    
+ 12  C1   1     POPA     C5B    12      0    
+
+[bonds]
+;  i     j   funct   length  force.c.
+   1     2    1       0.47     1250
+   2     3    1       0.47     1250
+   3     4    1       0.47     1250
+   4     5    1       0.47     1250
+   5     6    1       0.47     1250
+   6     7    1       0.47     1250
+   2     8    1       0.47     1250
+   8     9    1       0.47     1250 
+   9     10   1       0.47     1250
+   10    11   1       0.47     1250
+   11    12   1       0.47     1250
+ 
+[angles]
+;  i     j    k     funct   angle  force.c.
+    1     2    3       2    120.000   25.0 
+    1     2    8       2    180.000   25.0 
+    3     4    5       2   180.000  25.0 
+    4     5    6       2   180.000  25.0 
+    5     6    7       2   180.000  25.0
+   2     8     9       2   180.000  25.0 
+   8     9    10       2   180.000  25.0 
+   9    10    11       2   120.000  35.0 
+  10    11    12       2   180.000  25.0 
+
+;;;;;; DIOLEOYL PHOSPHATIDYLCHOLINE
+
+[moleculetype]
+; molname 	nrexcl
+  DOPC 		1
+
+[atoms]
+; id 	type 	resnr 	residu 	atom 	cgnr 	charge
+  1 	Q0 	1 	DOPC 	NC3 	1 	1.0 
+  2 	Qa 	1 	DOPC  	PO4 	2 	-1.0 
+  3 	Na 	1 	DOPC 	GL1 	3 	0 
+  4 	Na 	1 	DOPC 	GL2 	4 	0 
+  5 	C1 	1 	DOPC 	C1A 	5 	0 
+  6 	C1 	1 	DOPC 	C2A 	6 	0 
+  7 	C3 	1 	DOPC 	D3A 	7 	0 
+  8 	C1 	1 	DOPC 	C4A 	8 	0 
+  9 	C1 	1 	DOPC 	C5A 	9 	0 
+  10 	C1 	1 	DOPC 	C1B 	10 	0	 
+  11 	C1 	1 	DOPC 	C2B 	11 	0 
+  12 	C3 	1 	DOPC 	D3B 	12 	0 
+  13 	C1 	1 	DOPC 	C4B 	13 	0	 
+  14 	C1 	1 	DOPC 	C5B 	14 	0 
+
+[bonds]
+; i j 	funct 	length 	force.c.
+  1 2 	1 	0.47 	1250
+  2 3 	1 	0.47 	1250
+  3 4 	1 	0.37 	1250
+  3 5 	1 	0.47 	1250
+  5 6 	1 	0.47 	1250
+  6 7 	1 	0.47 	1250
+  7 8 	1 	0.47 	1250
+  8 9 	1 	0.47 	1250
+  4 10 	1 	0.47 	1250
+  10 11 1 	0.47 	1250
+  11 12 1 	0.47 	1250
+  12 13 1 	0.47 	1250
+  13 14 1 	0.47 	1250
+
+[angles]
+; i j k 	funct 	angle 	force.c.
+  2 3 4 	2 	120.0 	25.0 
+  2 3 5 	2 	180.0 	25.0 
+  3 5 6 	2 	180.0 	25.0 
+  5 6 7 	2 	180.0 	25.0 
+  6 7 8 	2 	120.0 	45.0 
+  7 8 9 	2 	180.0 	25.0 
+  4 10 11 	2 	180.0 	25.0 
+  10 11 12 	2 	180.0 	25.0 
+  11 12 13 	2 	120.0 	45.0 
+  12 13 14 	2 	180.0 	25.0 
+
+;;;;;; DIARACHIDONOYL PHOSPHATIDYLCHOLINE (20:4-20:4 PC)
+;;;;;; or di-(all-cis-5,8,11,14-eicosatetraenoyl)-PC
+
+[ moleculetype ]
+; 	molname 	nrexcl
+  	DAPC 	  	1
+
+[ atoms ]
+;id 	type 	resnr 	residu 	atom 	cgnr 	charge
+ 1 	Q0 	1 	DAPC 	NC3 	1 	1.0
+ 2 	Qa 	1 	DAPC 	PO4 	2 	-1.0
+ 3 	Na 	1 	DAPC 	GL1 	3 	0
+ 4 	Na 	1 	DAPC 	GL2 	4 	0
+ 5 	C4 	1 	DAPC 	D1A 	5 	0 	
+ 6 	C4 	1 	DAPC 	D2A 	6 	0
+ 7 	C4 	1 	DAPC 	D3A 	7 	0
+ 8 	C4 	1 	DAPC 	D4A 	8 	0
+ 9 	C2 	1 	DAPC 	C5A 	9 	0
+ 10 	C4 	1 	DAPC 	D1B 	10 	0
+ 11 	C4 	1 	DAPC 	D2B 	11 	0
+ 12 	C4 	1 	DAPC 	D3B 	12 	0
+ 13 	C4 	1 	DAPC 	D4B 	13 	0
+ 14 	C2 	1 	DAPC 	C5B 	14 	0
+
+[bonds]
+; i 	j 	funct 	length 	force.c.
+  1 	2 	1 	0.47 	1250
+  2 	3 	1 	0.47 	1250
+  3 	4 	1 	0.37 	1250
+  3 	5 	1 	0.47 	1250
+  5 	6 	1 	0.47 	1250
+  6 	7 	1 	0.47 	1250
+  7 	8 	1 	0.47 	1250
+  8 	9 	1 	0.47 	1250
+  4 	10 	1 	0.47 	1250
+  10 	11 	1 	0.47 	1250
+  11 	12 	1 	0.47 	1250
+  12 	13 	1 	0.47 	1250
+  13 	14 	1 	0.47 	1250
+
+[angles]
+; i 	j 	k 	funct 	angle 		force.c.
+  2 	3 	4 	2 	120.000 	25.0
+  2 	3 	5 	2 	180.000 	25.0
+  3 	5 	6 	2 	100.000 	10.0
+  5 	6 	7 	2 	100.000 	10.0
+  6 	7 	8 	2 	100.000 	10.0
+  7 	8 	9 	2 	120.000 	45.0
+  4 	10 	11 	2 	100.000 	10.0
+  10 	11 	12 	2 	100.000 	10.0
+  11 	12 	13 	2 	100.000 	10.0
+  12 	13 	14 	2 	120.000 	45.0
+
+;;;;;;
+;;;;;; COMMON PEs 
+;;;;;;
+;;;;;; DPPE, DHPE, DLPE, DSPE, POPE, DOPE
+;;;;;;
+
+;;;;;; DIPALMITOYL PHOSPHATIDYLETHANOLAMINE  
+;
+; in general models PEs with saturated tail lengths C15-18
+
+[moleculetype]
+; molname 	nrexcl
+  DPPE 		1
+
+[atoms]
+; id 	type 	resnr 	residu 	atom 	cgnr 	charge
+  1 	Qd 	1 	DPPE 	NH3 	1 	1.0 
+  2 	Qa 	1 	DPPE 	PO4 	2 	-1.0 
+  3 	Na 	1 	DPPE 	GL1 	3 	0 
+  4 	Na 	1 	DPPE 	GL2 	4 	0 
+  5 	C1 	1 	DPPE 	C1A 	5 	0 
+  6 	C1 	1 	DPPE 	C2A 	6 	0 
+  7 	C1 	1 	DPPE 	C3A 	7 	0 
+  8 	C1 	1 	DPPE 	C4A 	8 	0 
+  9 	C1 	1 	DPPE 	C1B 	9 	0 
+  10 	C1 	1 	DPPE 	C2B 	10 	0 
+  11 	C1 	1 	DPPE 	C3B 	11 	0 
+  12 	C1 	1 	DPPE 	C4B 	12 	0 
+
+[bonds]
+; i j 	funct 	length 	force.c.
+  1 2 	1 	0.470 	1250
+  2 3 	1 	0.470 	1250
+  3 4 	1 	0.370 	1250
+  3 5 	1 	0.470 	1250
+  5 6 	1 	0.470 	1250
+  6 7 	1 	0.470 	1250
+  7 8 	1 	0.470 	1250
+  4 9 	1 	0.470 	1250
+  9 10 	1 	0.470 	1250
+  10 11 1 	0.470 	1250
+  11 12 1 	0.470 	1250
+
+[angles]
+; i j k 	funct 	angle 	force.c.
+  2 3 4 	2 	120.0 	25.0 
+  2 3 5 	2 	180.0 	25.0 
+  3 5 6 	2 	180.0 	25.0 
+  5 6 7 	2 	180.0 	25.0 
+  6 7 8 	2 	180.0 	25.0 
+  4 9 10 	2 	180.0 	25.0 
+  9 10 11 	2 	180.0 	25.0 
+ 10 11 12 	2 	180.0 	25.0 
+
+;;;;;; DIPALMITOYL PHOSPHATIDYLETHANOLAMINE  
+;
+; in general models PEs with saturated tail lengths C15-18
+
+[moleculetype]
+; molname 	nrexcl
+  DPPG 		1
+
+[atoms]
+; id 	type 	resnr 	residu 	atom 	cgnr 	charge
+  1 	Nda 	1 	DPPG 	GLH 	1 	0 
+  2 	Qa 	1 	DPPG 	PO4 	2 	-1.0 
+  3 	Na 	1 	DPPG 	GL1 	3 	0 
+  4 	Na 	1 	DPPG 	GL2 	4 	0 
+  5 	C1 	1 	DPPG 	C1A 	5 	0 
+  6 	C1 	1 	DPPG 	C2A 	6 	0 
+  7 	C1 	1 	DPPG 	C3A 	7 	0 
+  8 	C1 	1 	DPPG 	C4A 	8 	0 
+  9 	C1 	1 	DPPG 	C1B 	9 	0 
+  10 	C1 	1 	DPPG 	C2B 	10 	0 
+  11 	C1 	1 	DPPG 	C3B 	11 	0 
+  12 	C1 	1 	DPPG 	C4B 	12 	0 
+
+[bonds]
+; i j 	funct 	length 	force.c.
+  1 2 	1 	0.470 	1250
+  2 3 	1 	0.470 	1250
+  3 4 	1 	0.370 	1250
+  3 5 	1 	0.470 	1250
+  5 6 	1 	0.470 	1250
+  6 7 	1 	0.470 	1250
+  7 8 	1 	0.470 	1250
+  4 9 	1 	0.470 	1250
+  9 10 	1 	0.470 	1250
+  10 11 1 	0.470 	1250
+  11 12 1 	0.470 	1250
+
+[angles]
+; i j k 	funct 	angle 	force.c.
+  2 3 4 	2 	120.0 	25.0 
+  2 3 5 	2 	180.0 	25.0 
+  3 5 6 	2 	180.0 	25.0 
+  5 6 7 	2 	180.0 	25.0 
+  6 7 8 	2 	180.0 	25.0 
+  4 9 10 	2 	180.0 	25.0 
+  9 10 11 	2 	180.0 	25.0 
+ 10 11 12 	2 	180.0 	25.0 
+ 
+;;;;;; DIHEXANOYL PHOSPHATIDYLETHANOLAMINE
+;
+; in general models PEs with saturated tail lengths C8-11
+
+[moleculetype]
+; molname 	nrexcl
+DHPE 1
+
+[atoms]
+; id 	type 	resnr 	residu 	atom 	cgnr 	charge
+  1 	Qd 	1 	DHPE 	NH3 	1 	1.0 
+  2 	Qa 	1 	DHPE  	PO4 	2 	-1.0 
+  3 	Na 	1 	DHPE 	GL1 	3 	0 
+  4 	Na 	1 	DHPE 	GL2 	4 	0 
+  5 	C1 	1 	DHPE 	C1A 	5 	0 
+  6 	C1 	1 	DHPE 	C2A 	6 	0 
+  7 	C1 	1 	DHPE 	C1B 	7 	0 
+  8 	C1 	1 	DHPE 	C2B 	8 	0 
+
+[bonds]
+; i j 	funct 	length 	force.c.
+  1 2 	1 	0.470 	1250
+  2 3 	1 	0.470 	1250
+  3 4 	1 	0.370 	1250
+  3 5 	1 	0.470 	1250
+  5 6 	1 	0.470 	1250
+  4 7 	1 	0.470 	1250
+  7 8 	1 	0.470 	1250
+
+[angles]
+; i j k 	funct 	angle 	force.c.
+  2 3 4 	2 	120.0 	25.0 
+  2 3 5 	2 	180.0 	25.0 
+  3 5 6 	2 	180.0 	25.0 
+  4 7 8 	2 	180.0 	25.0 
+
+;;;;;; DILAUROYL PHOSPHATIDYLETHANOLAMINE
+;
+; in general models PEs with saturated tail lengths C12-15, including DMPE
+
+[moleculetype]
+; molname 	nrexcl
+  DLPE 		1
+
+[atoms]
+; id 	type 	resnr 	residu 	atom 	cgnr 	charge
+   1 	Qd 	1 	DLPE 	NH3 	1 	1.0
+   2 	Qa 	1 	DLPE  	PO4 	2 	-1.0
+   3 	Na 	1 	DLPE 	GL1 	3 	0
+   4 	Na 	1 	DLPE 	GL2 	4 	0
+   5 	C1 	1 	DLPE 	C1A 	5 	0
+   6 	C1 	1 	DLPE 	C2A 	6 	0
+   7 	C1 	1 	DLPE 	C3A 	7 	0
+   8 	C1 	1 	DLPE 	C1B 	8 	0
+   9 	C1 	1 	DLPE 	C2B 	9 	0
+   10 	C1 	1 	DLPE 	C3B 	10 	0
+
+[bonds]
+; i j 	funct 	length 	force.c.
+  1 2 	1 	0.47 	1250
+  2 3 	1 	0.47 	1250
+  3 4 	1 	0.37 	1250
+  3 5 	1 	0.47 	1250
+  5 6 	1 	0.47 	1250
+  6 7 	1 	0.47 	1250
+  4 8 	1 	0.47 	1250
+  8 9 	1 	0.47 	1250
+  9 10 	1 	0.47 	1250
+
+[angles]
+; i j k 	funct 	angle 	force.c.
+  2 3 4 	2 	120.0 	25.0 
+  2 3 5 	2 	180.0 	25.0 
+  3 5 6 	2 	180.0 	25.0
+  5 6 7 	2 	180.0 	25.0
+  4 8 9 	2 	180.0 	25.0
+  8 9 10 	2 	180.0 	25.0
+
+;;;;;; DILAUROYL PHOSPHATIDYLGLYCEROL
+
+[ moleculetype ]
+; molname       nrexcl
+DLPG                1
+
+[ atoms ]
+;id type resnr residu atom cgnr   charge
+ 1   Nda  1     DLPG     GLH    1      0
+ 2   Qa   1     DLPG     PO4    2     -1.0
+ 3   Na   1     DLPG     GL1    3      0
+ 4   Na   1     DLPG     GL2    4      0
+ 5   C1   1     DLPG     C1A    5      0
+ 6   C1   1     DLPG     C2A    6      0
+ 7   C1   1     DLPG     C3A    7      0
+ 8   C1   1     DLPG     C1B    8      0
+ 9   C1   1     DLPG     C2B    9       0
+ 10  C1   1     DLPG     C3B    10      0
+
+[bonds]
+;  i     j   funct   length  force.c.
+   1     2    1       0.47     1250
+   2     3    1       0.47     1250
+   3     4    1       0.47     1250
+   3     5    1       0.47     1250
+   5     6    1       0.47     1250
+   6     7    1       0.47     1250
+   4     8    1       0.47     1250
+   8     9    1       0.47     1250
+   9     10   1       0.47     1250
+
+[angles]
+;  i     j    k     funct   angle  force.c.
+    2     3    4       2    120.000   25.0 
+    2     3    5       2    180.000   25.0 
+   3     5    6       2   180.000  25.0
+   5     6    7       2   180.000  25.0
+   4     8    9       2   180.000  25.0
+   8     9   10       2   180.000  25.0
+
+;;;;;; DISTEAROYL PHOSPHATIDYLETHANOLAMINE
+;
+; in general models PEs with saturated tail lengths C18-21
+
+[moleculetype]
+; molname 	nrexcl
+  DSPE 		1
+
+[atoms]
+; id 	type 	resnr 	residu 	atom 	cgnr 	charge
+  1 	Qd 	1 	DSPE 	NH3 	1 	1.0 
+  2 	Qa 	1 	DSPE  	PO4 	2 	-1.0 
+  3 	Na 	1 	DSPE 	GL1 	3 	0 
+  4 	Na 	1 	DSPE 	GL2 	4 	0 
+  5 	C1 	1 	DSPE 	C1A 	5 	0 
+  6 	C1 	1 	DSPE 	C2A 	6 	0 
+  7 	C1 	1 	DSPE 	C3A 	7 	0 
+  8 	C1 	1 	DSPE 	C4A 	8 	0 
+  9 	C1 	1 	DSPE 	C5A 	9 	0 
+  10 	C1 	1 	DSPE 	C1B 	10 	0 
+  11 	C1 	1 	DSPE 	C2B 	11 	0 
+  12 	C1 	1 	DSPE 	C3B 	12 	0	 
+  13 	C1 	1 	DSPE 	C4B 	13 	0 
+  14 	C1 	1 	DSPE 	C5B 	14 	0 
+
+[bonds]
+; i j 	funct 	length 	force.c.
+  1 2 	1 	0.47 	1250
+  2 3 	1 	0.47 	1250
+  3 4 	1 	0.37 	1250
+  3 5 	1 	0.47 	1250
+  5 6 	1 	0.47 	1250
+  6 7 	1 	0.47 	1250
+  7 8 	1 	0.47 	1250
+  8 9 	1 	0.47 	1250
+  4 10 	1 	0.47 	1250
+  10 11 1 	0.47 	1250
+  11 12 1 	0.47 	1250
+  12 13 1 	0.47 	1250
+  13 14 1 	0.47 	1250
+
+[angles]
+; i j k 	funct 	angle 	force.c.
+  2 3 4 	2 	120.0 	25.0 
+  2 3 5 	2 	180.0 	25.0 
+  3 5 6 	2 	180.0 	25.0 
+  5 6 7 	2 	180.0 	25.0 
+  6 7 8 	2 	180.0 	25.0 
+  7 8 9 	2 	180.0 	25.0 
+  4 10 11 	2 	180.0 	25.0 
+  10 11 12 	2 	180.0 	25.0 
+  11 12 13 	2 	180.0 	25.0 
+  12 13 14 	2 	180.0 	25.0 
+
+
+;;;;;; PALMITOYL OLEOYL PHOSPHATIDYLETHANOLAMINE
+
+[moleculetype]
+; molname 	nrexcl
+  POPE 1
+
+[atoms]
+; id 	type 	resnr 	residu 	atom 	cgnr 	charge
+  1 	Qd 	1  	POPE 	NH3 	1 	1.0 
+  2 	Qa 	1  	POPE 	PO4 	2 	-1.0 
+  3 	Na 	1  	POPE 	GL1 	3 	0 
+  4 	Na 	1  	POPE 	GL2 	4 	0 
+  5 	C1 	1  	POPE 	C1A 	5 	0 
+  6 	C1 	1  	POPE 	C2A 	6 	0 
+  7 	C1 	1  	POPE 	C3A 	7 	0 
+  8 	C1 	1  	POPE 	C4A 	8 	0 
+  9 	C1 	1  	POPE 	C1B 	9 	0 
+  10 	C1 	1  	POPE 	C2B 	10 	0 
+  11 	C3 	1  	POPE 	D3B 	11 	0 
+  12 	C1 	1  	POPE 	C4B 	12 	0 
+  13 	C1 	1  	POPE 	C5B 	13 	0 
+
+[bonds]
+; i j 	funct 	length 	force.c.
+  1 2 	1 	0.47 	1250
+  2 3 	1 	0.47 	1250
+  3 4 	1 	0.37 	1250
+  4 5 	1 	0.47 	1250
+  5 6 	1 	0.47 	1250
+  6 7 	1 	0.47 	1250
+  7 8 	1 	0.47 	1250
+  3 9 	1 	0.47 	1250
+  9 10 	1 	0.47 	1250
+  10 11 1 	0.47 	1250
+  11 12 1 	0.47 	1250
+  12 13 1 	0.47 	1250
+
+[angles]
+; i j k 	funct 	angle 	force.c.
+  2 3 4 	2 	120.0 	25.0 
+  2 3 9 	2 	180.0 	25.0 
+  4 5 6 	2 	180.0 	25.0 
+  5 6 7 	2 	180.0 	25.0 
+  6 7 8 	2 	180.0 	25.0 
+  3 9 10 	2 	180.0 	25.0 
+  9 10 11 	2 	180.0 	25.0 
+  10 11 12 	2 	120.0 	45.0 
+  11 12 13 	2 	180.0 	25.0 
+
+[moleculetype]
+; molname 	nrexcl
+  PVPE 1
+
+[atoms]
+; id 	type 	resnr 	residu 	atom 	cgnr 	charge
+  1 	Qd 	1  	PVPE 	NH3 	1 	1.0 
+  2 	Qa 	1  	PVPE 	PO4 	2 	-1.0 
+  3 	Na 	1  	PVPE 	GL1 	3 	0 
+  4 	Na 	1  	PVPE 	GL2 	4 	0 
+  5 	C1 	1  	PVPE 	C1A 	5 	0 
+  6 	C1 	1  	PVPE 	C2A 	6 	0 
+  7 	C1 	1  	PVPE 	C3A 	7 	0 
+  8 	C1 	1  	PVPE 	C4A 	8 	0 
+  9 	C1 	1  	PVPE 	C1B 	9 	0 
+  10 	C1 	1  	PVPE 	C2B 	10 	0 
+  11 	C3 	1  	PVPE 	D3B 	11 	0 
+  12 	C1 	1  	PVPE 	C4B 	12 	0 
+  13 	C1 	1  	PVPE 	C5B 	13 	0 
+
+[bonds]
+; i j 	funct 	length 	force.c.
+  1 2 	1 	0.47 	1250
+  2 3 	1 	0.47 	1250
+  3 4 	1 	0.37 	1250
+  4 5 	1 	0.47 	1250
+  5 6 	1 	0.47 	1250
+  6 7 	1 	0.47 	1250
+  7 8 	1 	0.47 	1250
+  3 9 	1 	0.47 	1250
+  9 10 	1 	0.47 	1250
+  10 11 1 	0.47 	1250
+  11 12 1 	0.47 	1250
+  12 13 1 	0.47 	1250
+
+[angles]
+; i j k 	funct 	angle 	force.c.
+  2 3 4 	2 	120.0 	25.0 
+  2 3 9 	2 	180.0 	25.0 
+  4 5 6 	2 	180.0 	25.0 
+  5 6 7 	2 	180.0 	25.0 
+  6 7 8 	2 	180.0 	25.0 
+  3 9 10 	2 	180.0 	25.0 
+  9 10 11 	2 	180.0 	25.0 
+  10 11 12 	2 	120.0 	45.0 
+  11 12 13 	2 	180.0 	25.0 
+
+;;;;;; DIOLEOYL PHOSPHATIDYLETHANOLAMINE
+
+[moleculetype]
+; molname 	nrexcl
+  DOPE 		1
+
+[atoms]
+; id 	type 	resnr 	residu 	atom 	cgnr 	charge
+  1 	Qd 	1 	DOPE 	NH3 	1 	1.0 
+  2 	Qa 	1 	DOPE  	PO4 	2 	-1.0 
+  3 	Na 	1 	DOPE 	GL1 	3 	0 
+  4 	Na 	1 	DOPE 	GL2 	4 	0 
+  5 	C1 	1 	DOPE 	C1A 	5 	0 
+  6 	C1 	1 	DOPE 	C2A 	6 	0 
+  7 	C3 	1 	DOPE 	D3A 	7 	0 
+  8 	C1 	1 	DOPE 	C4A 	8 	0 
+  9 	C1 	1 	DOPE 	C5A 	9 	0 
+  10 	C1 	1 	DOPE 	C1B 	10 	0	 
+  11 	C1 	1 	DOPE 	C2B 	11 	0 
+  12 	C3 	1 	DOPE 	D3B 	12 	0 
+  13 	C1 	1 	DOPE 	C4B 	13 	0	 
+  14 	C1 	1 	DOPE 	C5B 	14 	0 
+
+[bonds]
+; i j 	funct 	length 	force.c.
+  1 2 	1 	0.47 	1250
+  2 3 	1 	0.47 	1250
+  3 4 	1 	0.37 	1250
+  3 5 	1 	0.47 	1250
+  5 6 	1 	0.47 	1250
+  6 7 	1 	0.47 	1250
+  7 8 	1 	0.47 	1250
+  8 9 	1 	0.47 	1250
+  4 10 	1 	0.47 	1250
+  10 11 1 	0.47 	1250
+  11 12 1 	0.47 	1250
+  12 13 1 	0.47 	1250
+  13 14 1 	0.47 	1250
+
+[angles]
+; i j k 	funct 	angle 	force.c.
+  2 3 4 	2 	120.0 	25.0 
+  2 3 5 	2 	180.0 	25.0 
+  3 5 6 	2 	180.0 	25.0 
+  5 6 7 	2 	180.0 	25.0 
+  6 7 8 	2 	120.0 	45.0 
+  7 8 9 	2 	180.0 	25.0 
+  4 10 11 	2 	180.0 	25.0 
+  10 11 12 	2 	180.0 	25.0 
+  11 12 13 	2 	120.0 	45.0 
+  12 13 14 	2 	180.0 	25.0 
+
+;;;;;;
+;;;;;; SPHINGHOLIPIDS
+;;;;;;
+;;;;;; PPCS, ...
+
+
+;;;;;; PALMITOYL SPHINGOMYELINE PC
+
+; not tested!!
+
+[moleculetype]
+; molname 	nrexcl
+  PPCS 1
+
+[atoms]
+; id 	type 	resnr 	residu 	atom 	cgnr 	charge
+   1 	Q0 	1 	PPCS 	NC3 	1 	1.0 
+   2 	Qa 	1 	PPCS  	PO4 	2 	-1.0 
+   3 	P5 	1 	PPCS 	AM1 	3 	0 
+   4 	P1 	1 	PPCS 	AM2 	4 	0 
+   5 	C1 	1 	PPCS 	C1A 	5 	0 
+   6 	C1 	1 	PPCS 	C2A 	6 	0 
+   7 	C1 	1 	PPCS 	C3A 	7 	0 
+   8 	C1 	1 	PPCS 	C4A 	8 	0 
+   9 	C3 	1 	PPCS 	D1B 	9 	0 
+   10 	C1 	1 	PPCS 	C2B 	10 	0 
+   11 	C1 	1 	PPCS 	C3B 	11 	0 
+   12 	C1 	1 	PPCS 	C4B 	12 	0 
+
+[bonds]
+; i j 	funct 	length 	force.c.
+  1 2 	1 	0.47 	1250
+  2 3 	1 	0.47 	1250
+  3 4 	1 	0.37 	1250
+  3 5 	1 	0.47 	1250
+  5 6 	1 	0.47 	1250
+  6 7 	1 	0.47 	1250
+  7 8 	1 	0.47 	1250
+  4 9 	1 	0.47 	1250
+  9 10 	1 	0.47 	1250
+  10 11 1 	0.47 	1250
+  11 12 1 	0.47 	1250
+
+[angles]
+; i j k 	funct 	angle 	force.c.
+  2 3 4 	2 	120.0 	25.0 
+  2 3 5 	2 	180.0 	25.0 
+  3 5 6 	2 	180.0 	25.0 
+  5 6 7 	2 	180.0 	25.0 
+  6 7 8 	2 	180.0 	25.0 
+  4 9 10 	2 	180.0 	45.0 
+  9 10 11 	2 	180.0 	25.0 
+  10 11 12 	2 	180.0 	25.0 
+
+;;;;;; PALMITOYL SPHINGOSINE PHOSPHATE
+
+; not tested!!
+
+[moleculetype]
+; molname 	nrexcl
+  PCS 1
+
+[atoms]
+; id 	type 	resnr 	residu 	atom 	cgnr 	charge
+   1 	Qa 	1 	PCS  	PO4 	1 	-1.0 
+   2 	P1 	1 	PCS 	AM2 	2 	0 
+   3 	C3 	1 	PCS 	D1A 	3 	0 
+   4 	C1 	1 	PCS 	C2A 	4 	0 
+   5 	C1 	1 	PCS 	C3A 	5 	0 
+   6 	C1 	1 	PCS 	C4A 	6 	0 
+
+[bonds]
+; i j 	funct 	length 	force.c.
+  1 2 	1 	0.47 	1250
+  2 3 	1 	0.47 	1250
+  3 4 	1 	0.47 	1250
+  4 5 	1 	0.47 	1250
+  5 6 	1 	0.47 	1250
+
+[angles]
+; i j k 	funct 	angle 	force.c.
+  1 2 3 	2 	180.0 	25.0 
+  2 3 4 	2 	120.0 	25.0 
+  3 4 5 	2 	180.0 	25.0 
+  4 5 6 	2 	180.0 	25.0 
+
+
+;;;;;; PHOSPHATIDYLSERINE LIPIDS
+
+
+[ moleculetype ]
+; molname       nrexcl
+DLPS                1
+
+[ atoms ]
+;id type resnr residu atom cgnr   charge
+ 1   Qa   1     DLPS     COO    1     -1.0
+ 2   Qd   1     DLPS     NH3    2      1.0
+ 3   Qa   1     DLPS     PO4    3     -1.0
+ 4   Na   1     DLPS     GL1    4      0
+ 5   Na   1     DLPS     GL2    5      0
+ 6   C1   1     DLPS     C1A    6      0
+ 7   C1   1     DLPS     C2A    7      0
+ 8   C1   1     DLPS     C3A    8      0
+ 9   C1   1     DLPS     C1B    9      0
+ 10  C1   1     DLPS     C2B    10     0
+ 11  C1   1     DLPS     C3B    11     0
+
+[bonds]
+;  i     j   funct   length  force.c.
+   1     2    1       0.47     1250
+   2     3    1       0.47     1250
+   3     4    1       0.47     1250
+   4     5    1       0.37     1250
+   4     6    1       0.47     1250
+   6     7    1       0.47     1250
+   7     8    1       0.47     1250
+   5     9    1       0.47     1250
+   9     10   1       0.47     1250
+   10    11   1       0.47     1250
+
+[angles]
+;  i     j    k     funct   angle  force.c.
+   2     3    4       2    80.000  25.0
+   3     4    5       2   120.000  25.0
+   3     4    6       2   180.000  25.0
+   4     6    7       2   180.000  25.0
+   6     7    8       2   180.000  25.0
+   5     9   10       2   180.000  25.0
+   9    10   11       2   180.000  25.0
+
+[ moleculetype ]
+; molname       nrexcl
+DPPS                1
+
+[ atoms ]
+;id type resnr residu atom cgnr   charge
+ 1   Qa   1     DPPS     COO    1     -1.0
+ 2   Qd   1     DPPS     NH3    2      1.0
+ 3   Qa   1     DPPS     PO4    3     -1.0
+ 4   Na   1     DPPS     GL1    4      0
+ 5   Na   1     DPPS     GL2    5      0
+ 6   C1   1     DPPS     C1A    6      0
+ 7   C1   1     DPPS     C2A    7      0
+ 8   C1   1     DPPS     C3A    8      0
+ 9   C1   1     DPPS     C4A    9      0
+ 10  C1   1     DPPS     C1B    10     0
+ 11  C1   1     DPPS     C2B    11     0
+ 12  C1   1     DPPS     C3B    12     0
+ 13  C1   1     DPPS     C4B    13     0
+
+[bonds]
+;  i     j   funct   length  force.c.
+   1     2    1       0.470    1250
+   2     3    1       0.470    1250
+   3     4    1       0.470    1250
+   4     5    1       0.370    1250
+   4     6    1       0.470    1250
+   6     7    1       0.470    1250
+   7     8    1       0.470    1250
+   8     9    1       0.470    1250
+   5     10   1       0.470    1250
+   10    11   1       0.470    1250
+   11    12   1       0.470    1250
+   12    13   1       0.470    1250
+
+[angles]
+;  i     j    k     funct   angle  force.c.
+   2     3    4       2    80.000  25.0
+   3     4    5       2   120.000  25.0
+   3     4    6       2   180.000  25.0
+   4     6    7       2   180.000  25.0
+   6     7    8       2   180.000  25.0
+   7     8    9       2   180.000  25.0
+   5    10   11       2   180.000  25.0
+  10    11   12       2   180.000  25.0
+  11    12   13       2   180.000  25.0
+
+[ moleculetype ]
+; molname       nrexcl
+POPS                1
+
+[ atoms ]
+;id type resnr residu atom cgnr   charge
+ 1   P5   1     POPS     NCO    1      0
+ 2   Qa   1     POPS     PO4    2     -1.0
+ 3   Na   1     POPS     GL1    3      0
+ 4   Na   1     POPS     GL2    4      0
+ 5   C1   1     POPS     C1A    5      0
+ 6   C1   1     POPS     C2A    6      0
+ 7   C1   1     POPS     C3A    7      0
+ 8   C1   1     POPS     C4A    8      0
+ 9   C1   1     POPS     C1B    9      0
+ 10  C1   1     POPS     C2B    10     0
+ 11  C3   1     POPS     D3B    11     0
+ 12  C1   1     POPS     C4B    12     0
+ 13  C1   1     POPS     C5B    13     0
+
+[bonds]
+;  i     j   funct   length  force.c.
+   1     2    1       0.470    1250
+   2     3    1       0.470    1250
+   3     4    1       0.470    1250
+   4     5    1       0.470    1250
+   5     6    1       0.470    1250
+   6     7    1       0.470    1250
+   7     8    1       0.470    1250
+   3     9    1       0.470    1250
+   9     10   1       0.470    1250
+   10    11   1       0.470    1250
+   11    12   1       0.470    1250
+   12    13   1       0.470    1250
+
+[angles]
+;  i     j    k     funct   angle  force.c.
+   2     3    4       2   120.000   25.0
+   2     3    9       2   180.000   25.0
+   4     5    6       2   180.000   25.0
+   5     6    7       2   180.000   25.0
+   6     7    8       2   180.000   25.0
+   3     9   10       2   180.000   25.0
+   9    10   11       2   180.000   25.0
+  10    11   12       2   180.000   25.0
+
+
+
+;;;;;; PIP2
+
+[moleculetype]
+; molname 	nrexcl
+  PIP2  1
+
+[atoms]
+; id 	type 	resnr 	residu 	atom 	cgnr 	charge
+  1 	Qa 	1  	PIP2 	PO1 	1 	-2.0 
+  2 	Qa 	1  	PIP2 	PO2 	2 	-2.0 
+  3 	SP1	1  	PIP2 	RP1 	3 	0 
+  4 	SP1	1  	PIP2 	RP2 	4 	0  
+  5 	SP1 	1  	PIP2 	RP3 	5 	0
+  6 	Qa 	1  	PIP2 	PO3 	6 	-1.0 
+  7 	Na 	1  	PIP2 	GL1 	7 	0 
+  8 	Na 	1  	PIP2 	GL2 	8 	0 
+  9 	C1  	1  	PIP2 	C1A 	9 	0 
+  10 	C1  	1  	PIP2 	C2A 	10 	0 
+  11	C1 	1  	PIP2 	C3A 	11	0 
+  12	C1 	1  	PIP2 	C4A 	12	0 
+  13	C1 	1  	PIP2 	C1B 	13	0 
+  14 	C1 	1  	PIP2 	C2B 	14 	0 
+  15 	C1 	1  	PIP2 	C3B 	15 	0 
+  16 	C1 	1  	PIP2 	C4B 	16 	0 
+  17 	C1 	1  	PIP2 	C5B 	17 	0 
+  
+[bonds]
+; i j 	funct 	length 	force.c.
+  1 3 	1 	0.30 	5000
+  2 3   1       0.34    5000
+  2 4 	1 	0.34 	5000
+  3 4 	1 	0.30 	20000
+  3 5   1       0.30    20000
+  4 5 	1 	0.30 	20000
+  5 6 	1 	0.30 	5000
+  6 7 	1 	0.47 	1250
+  7 8 	1 	0.37 	1250
+  8 9 	1 	0.47 	1250
+  9 10 	1 	0.47 	1250
+  10 11 1 	0.47 	1250
+  11 12 1 	0.47 	1250
+  7  13 1 	0.47 	1250
+  13 14 1 	0.47 	1250
+  14 15 1 	0.47 	1250
+  15 16 1 	0.47 	1250
+  16 17 1 	0.47 	1250
+
+[angles]
+; i j k 	funct 	angle 	force.c.
+  1 3 6         2       180.0   45.0
+  2 4 6         2       120.0   45.0
+  1 5 6         2       180.0   45.0
+  2 5 6         2       180.0   45.0
+  3 4 5 	2 	120.0 	25.0 
+  4 5 3  	2 	120.0 	25.0 
+  5 6 7         2       180.0   25.0
+  6 7 8 	2 	120.0 	25.0 
+  6 7 13 	2 	180.0 	25.0 
+  7 8 9         2       180.0   25.0
+  8 9 10 	2 	180.0 	25.0 
+  9 10 11 	2 	180.0 	25.0 
+  10 11 12 	2 	180.0 	25.0 
+  7 13 14 	2 	180.0 	25.0 
+  13 14 15 	2 	180.0 	25.0 
+  14 15 16 	2 	180.0 	25.0 
+  15 16 17 	2 	180.0 	25.0 
+
+
+;;;;;; PIP3
+
+[moleculetype]
+; molname 	nrexcl
+  PI3  1
+
+[atoms]
+; id 	type 	resnr 	residu 	atom 	cgnr 	charge
+  1 	Qa 	1  	PI3 	PO0 	1 	-2.0 
+  2 	Qa 	1  	PI3 	PO1 	2 	-2.0 
+  3 	Qa 	1  	PI3 	PO2 	3 	-2.0 
+  4 	SP1	1  	PI3 	RP1 	4 	0 
+  5 	SP1	1  	PI3 	RP2 	5 	0  
+  6 	SP1 	1  	PI3 	RP3 	6 	0
+  7 	Qa 	1  	PI3 	PO3 	7 	-1.0 
+  8 	Na 	1  	PI3 	GL1 	8 	0 
+  9 	Na 	1  	PI3 	GL2 	9 	0 
+  10 	C1 	1  	PI3 	C1A 	10 	0 
+  11 	C1 	1  	PI3 	C2A 	11	0 
+  12	C1 	1  	PI3 	C3A 	12	0 
+  13	C1 	1  	PI3 	C4A 	13	0 
+  14	C1 	1  	PI3 	C1B 	14	0 
+  15 	C1 	1  	PI3 	C2B 	15 	0 
+  16 	C1 	1  	PI3 	C3B 	16 	0 
+  17 	C1 	1  	PI3 	C4B 	17 	0 
+  18 	C1 	1  	PI3 	C5B 	18 	0 
+
+[bonds]
+; i j 	funct 	length 	force.c.
+  1 5   1       0.30    5000   
+  2 4 	1 	0.30 	5000
+  3 4   1       0.34    5000
+  3 5 	1 	0.34 	5000
+  4 5 	1 	0.30 	20000
+  4 6   1       0.30    20000
+  5 6 	1 	0.30 	20000
+  6 7 	1 	0.30 	5000
+  7 8 	1 	0.47 	1250
+  8 9 	1 	0.37 	1250
+  9 10 	1 	0.47 	1250
+  10 11 1 	0.47 	1250
+  11 12 1 	0.47 	1250
+  12 13 1 	0.47 	1250
+  8  14 1 	0.47 	1250
+  14 15 1 	0.47 	1250
+  15 16 1 	0.47 	1250
+  16 17 1 	0.47 	1250
+  17 18 1 	0.47 	1250
+
+[angles]
+; i j k 	funct 	angle 	force.c.
+  1 5 7         2       180.0   45.0
+  2 4 7         2       180.0   45.0
+  3 5 7         2       120.0   45.0
+  1 6 7         2       180.0   45.0
+  2 6 7         2       180.0   45.0
+  3 6 7         2       180.0   45.0
+  4 5 6 	2 	120.0 	25.0 
+  5 6 4  	2 	120.0 	25.0 
+  6 7 8         2       180.0   25.0
+  7 8 9 	2 	120.0 	25.0 
+  7 8 14 	2 	180.0 	25.0 
+  8 9 10        2       180.0   25.0
+  9 10 11 	2 	180.0 	25.0 
+  10 11 12 	2 	180.0 	25.0 
+  11 12 13 	2 	180.0 	25.0 
+  8 14 15 	2 	180.0 	25.0 
+  14 15 16 	2 	180.0 	25.0 
+  15 16 17 	2 	180.0 	25.0 
+  16 17 18 	2 	180.0 	25.0 
+
+; CHOLESTEROL
+;
+; Please cite: 
+;
+;  S.J. Marrink, A.H. de Vries, T.A. Harroun, J. Katsaras, S.R. Wassall.
+;  Cholesterol shows preference for the interior of polyunsaturated lipid membranes.
+;  JACS, 130:10-11, 2008.
+
+[moleculetype] 	; This topology is stable with an integration timestep of 30 fs.
+; molname 	nrexcl
+  CHOL 		1
+                                                                                
+[atoms]
+; id 	type 	resnr 	residu 	atom 	cgnr 	charge
+  1 	SP1 	1 	CHOL 	ROH 	1 	0
+  2 	SC1 	1 	CHOL 	R1 	2 	0
+  3 	SC3 	1 	CHOL 	R2 	3 	0
+  4 	SC1 	1 	CHOL 	R3 	4 	0
+  5 	SC1 	1 	CHOL 	R4 	5 	0
+  6 	SC1 	1 	CHOL 	R5 	6 	0
+  7 	SC1 	1 	CHOL 	C1 	7 	0
+  8 	C1 	1 	CHOL 	C2 	8 	0
+                                                                                
+[bonds]
+; i j 	funct 	length 	force.c.
+  1 2 	1 	0.242 	20000
+  2 3 	1 	0.260 	20000
+  2 4 	1 	0.341 	20000
+  4 6 	1 	0.213 	20000
+  4 7 	1 	0.544 	20000 
+  5 6 	1 	0.203 	20000
+  6 7 	1 	0.368 	20000
+  7 8 	1 	0.425 	1250
+                                                                                
+[constraints]
+; i j 	funct 	length ; cholesterol frame constraint
+  1 3 	1 	0.493 
+  1 4 	1 	0.604
+  3 4 	1 	0.272
+  3 5 	1 	0.346
+  4 5 	1 	0.294 
+  5 7 	1 	0.406
+                                                                                
+[angles]
+; i j k 	funct 	angle 	force.c.
+  4 7 8 	2 	180.0   25.0
+                                                                                
+[dihedrals]
+; i j k l 	funct 	angle 	force.c.  ; multiple dihedrals work better
+  1 3 5 7 	2 	0.0 	100.0 
+  1 3 5 4 	2 	0.0 	100.0
+  1 4 5 3 	2 	0.0 	100.0
+  4 7 5 3 	2 	0.0 	100.0
+  3 5 7 4 	2 	0.0 	100.0
+  2 1 3 4 	2 	-45.0 	300.0
+  2 4 3 1 	2 	45.0 	300.0
+  6 4 5 7 	2 	-45.0 	300.0
+  6 7 5 4 	2 	45.0 	300.0
+                                                                                
+[exclusions]
+   1 2 3 4 5 6 7
+   2 3 4 5 6 7
+   3 4 5 6 7
+   4 5 6 7
+   5 6 7
+   6 7
+
+;;;;;; TOPOLOGIES FOR SURFACTANTS
+;
+; surfactants are defined here as single tail amphipatic  molecules
+
+
+;;;;;; DODECYL PHOSPHOCHOLINE
+
+[moleculetype]
+; molname 	nrexcl
+  DPC 		1
+
+[atoms]
+; id 	type 	resnr 	residu 	atom 	cgnr 	charge
+  1 	Q0 	1 	DPC 	NC3 	1 	1.0 
+  2 	Qa 	1 	DPC 	PO4 	2 	-1.0 
+  3 	C1 	1 	DPC 	C1 	3 	0 
+  4 	C1 	1 	DPC 	C2 	4 	0 
+  5 	C1 	1 	DPC 	C3 	5 	0 
+
+[bonds]
+; i j 	funct 	length 	force.c.
+  1 2 	1 	0.47 	1250
+  2 3 	1 	0.47 	1250
+  3 4 	1 	0.47 	1250
+  4 5 	1 	0.47 	1250
+
+[angles]
+; i j k 	funct 	angle 	force.c.
+  3 4 5 	2 	180.0 	25.0 
+
+;;;;;; HEXANOYL PHOSPHATIDYLCHOLINE
+
+[moleculetype]
+; molname 	nrexcl
+  HPC 		1
+
+[atoms]
+; id 	type 	resnr 	residu 	atom 	cgnr 	charge
+  1 	Q0 	1 	HPC 	NC3 	1 	1.0 
+  2 	Qa 	1 	HPC 	PO4 	2 	-1.0 
+  3 	P1 	1 	HPC 	GL1 	3 	0 
+  4 	Na 	1 	HPC 	GL2 	4 	0 
+  5 	C1 	1 	HPC 	C2B 	5 	0 
+
+[bonds]
+; i j 	funct 	length 	force.c.
+  1 2 	1 	0.470 	1250
+  2 3 	1 	0.470 	1250
+  3 4 	1 	0.470 	1250
+  4 5 	1 	0.470 	1250
+
+[angles]
+; i j k 	funct 	angle 	force.c.
+  2 3 4 	2 	180.0 	25.0 
+  3 4 5 	2 	180.0 	25.0 
+
+;;;;;; PALMITOYL PHOSPHATIDYLCHOLINE
+
+[moleculetype]
+; molname 	nrexcl
+  PPC 		1
+
+[atoms]
+; id 	type 	resnr 	residu 	atom 	cgnr 	charge
+  1 	Q0 	1 	PPC 	NC3 	1 	1.0 
+  2 	Qa 	1 	PPC 	PO4 	2 	-1.0 
+  3 	P1 	1 	PPC 	GL1 	3 	0 
+  4 	Na 	1 	PPC 	GL2 	4 	0 
+  5 	C1 	1 	PPC 	C2B 	5 	0 
+  6 	C1 	1 	PPC 	C3B 	6 	0 
+  7 	C1 	1 	PPC 	C4B 	7 	0 
+
+[bonds]
+; i j 	funct 	length 	force.c.
+  1 2 	1 	0.470 	1250
+  2 3 	1 	0.470 	1250
+  3 4 	1 	0.470 	1250
+  4 5 	1 	0.470 	1250
+  5 6 	1 	0.470 	1250
+  6 7 	1 	0.470 	1250
+
+[angles]
+; i j k 	funct 	angle 	force.c.
+  2 3 4 	2 	180.0 	25.0 
+  3 4 5 	2 	180.0 	25.0 
+  4 5 6 	2 	180.0 	25.0 
+  5 6 7 	2 	180.0 	25.0 
+
+
+;;;;;; PALMITOYL CARBOXYLIC ACID 
+
+[moleculetype]
+; molname 	nrexcl
+  PCA 		1
+
+[atoms]
+; id 	type 	resnr 	residu 	atom 	cgnr 	charge
+  1 	P4 	1 	PCA 	COO 	1 	0 
+  2 	C1 	1 	PCA 	C1 	2 	0 
+  3 	C1 	1 	PCA 	C2 	3 	0 
+  4 	C1 	1 	PCA 	C3 	4 	0 
+  5 	C1 	1 	PCA 	C4 	5 	0 
+
+[bonds]
+; i j 	funct 	length 	force.c.
+  1 2 	1 	0.47 	1250
+  2 3 	1 	0.47 	1250
+  3 4 	1 	0.47 	1250
+  4 5 	1 	0.47 	1250
+
+[angles]
+; i j k 	funct 	angle 	force.c.
+  1 2 3 	2 	180.0 	25.0 
+  2 3 4 	2 	180.0 	25.0 
+  3 4 5 	2 	180.0 	25.0 
+
+;BOG
+
+[ moleculetype ]
+; molname nrexcl
+BOG            1
+
+[ atoms ]
+;id type resnr residu atom cgnr charge mass
+1   P1   1     BOG   B1   1    0.000  60.0528
+2   P4   1     BOG   B2   2    0.000  43.0454
+3   P4   1     BOG   B3   3    0.000  60.0528
+4   C1   1     BOG   C1   4    0  
+5   C1 	 1     BOG   C2   5    0
+
+[ bonds ]
+; i j   funct   length  forcec. 
+;  1 2   1       0.375   35000
+;  1 3   1       0.331   35000
+;  2 3   1       0.322   50000
+  2 4   1       0.470   1250
+  4 5   1       0.470   1250
+  
+;[ constraints ]
+; i j   funct   length  forcec. 
+  1 2 	1	0.375	35000
+  1 3 	1	0.331	35000
+  2 3 	1	0.322	50000
+
+[ angles ]
+; i j k     funct   angle  forcec.
+  1 2 4     2       153.85 25
+  3 2 4     2       153.85 25
+  2 4 5	    2	    180	   25  
+
+[ dihedrals ]
+; i j k l   funct   angle  forcec.  multiplic.
+  1 2 3 4   1       180	   5        1
+
+;DDM
+
+[ moleculetype ]
+; molname nrexcl
+DDM      1
+
+[ atoms ]
+;id     type    resnr   residu  atom    cgnr    charge mass
+ 1      P1      1	DDM     B1      1	0.000  60.0528
+ 2      P2      1	DDM     B2      2	0.000  59.0448
+ 3      P4      1	DDM     B3      3	0.000  60.0528
+ 4      P2      1	DDM     B4      4	0.000  43.0454
+ 5      P1      1	DDM     B5      5	0.000  60.0528
+ 6      P4      1	DDM     B6      6	0.000  60.0528
+ 7      C1      1       DDM     C1      7	0  
+ 8      C1 	1       DDM     C2      8	0
+ 9      C1      1       DDM     C3      9	0
+  
+  
+[ bonds ]
+; i j   funct   length  forcec. 
+  1 2	1       0.222   30000
+  2 3	1       0.246   30000
+  2 4	1       0.561   30000
+  4 5	1       0.239   30000
+  4 6	1       0.281   30000
+  4 7 	1       0.470 	1250
+  7 8 	1       0.470 	1250
+  8 9 	1       0.470 	1250
+
+[ constraints ]
+; i j   funct   length  forcec. 
+  1 2   1 	0.222 	30000
+  2 3   1 	0.246 	30000
+  2 4   1 	0.561 	30000
+  4 5   1 	0.239 	30000
+  4 6   1 	0.281 	30000
+
+[ angles ]
+; i j k     funct   angle  forcec.
+  1 2 4     2	    150	   50
+  3 2 4     2	    140	   50
+  5 4 2     2	    70	   100
+  6 4 2     2	    50	   25
+  2 4 7	    2	    180	   25
+  4 7 8	    2	    180	   25
+  7 8 9     2 	    180	   25
+  
+[ dihedrals ]
+; i j k l   funct   angle  forcec.  multiplic.
+  1 2 4 5   1       110	   8        1
+  1 2 4 6   1       -20	   5        1
+  3 2 4 5   1       -80	   5        1
+
+;TOCO
+
+[moleculetype]
+; molname 	nrexcl
+  TOCO  1
+
+[atoms]
+; id 	type 	resnr 	residu 	atom 	cgnr 	charge
+  1 	SC1	1  	TOCO  	P1A 	1 	0 
+  2 	SP1	1  	TOCO  	P2A 	2 	0 
+  3 	SP1	1  	TOCO  	P3A 	3 	0
+  4 	SC1	1  	TOCO  	P4A 	4 	0 
+  5 	SP1	1  	TOCO  	P5A 	5 	0 
+  6 	C1	1  	TOCO  	C1A 	6 	0
+  7 	C1	1  	TOCO  	C2A 	7 	0  
+  8 	C1 	1  	TOCO  	C3A 	8 	0  
+
+[bonds]
+; i j 	funct 	length 	force.c.
+  1 2 	1 	0.25 	20000
+  2 3   1       0.25    20000 
+  2 4   1       0.25    20000
+  3 1 	1 	0.25 	20000
+  3 4 	1 	0.25 	20000
+  4 5   1       0.25    20000
+  3 5 	1 	0.25 	20000
+  5 6   1 	0.47 	1250
+  6 7   1 	0.47 	1250
+  7 8   1 	0.47 	1250  
+  
+[angles]
+; i j k 	funct 	angle 	force.c.
+  1 2 3 	2 	120.0 	25.0 
+;  3 1 2  	2 	120.0 	25.0
+;  2 3 1         2       120.0   25.0
+  3 4 5 	2 	120.0 	25.0 
+;  5 3 4  	2 	120.0 	25.0  
+;  4 5 3         2       120.0   25.0 
+  2 3 4  	2 	120.0 	25.0
+;  2 4 3  	2 	120.0 	25.0
+;  4 2 3  	2 	120.0 	25.0
+  3 5 6         2       180.0   25.0  
+  5 6 7         2       180.0   25.0
+  6 7 8         2       180.0   25.0
+
+[ dihedrals ]
+; i j k l   funct   angle  forcec.  multiplic.
+  1 2 3 4   1       180	   5       1
+  2 3 4 5   1       180	   5       1  
+  1 2 4 5   1         0	   5       1
+
+;;;;;; DI-[1-PALMITOYL-2-OLEOYL-PHOSPHATIDYL-GLYCEROL] (most abundant Cardiolipin in E. coli membranes, well cis-vaccenate not oleate but they are the same in Martini)
+;;;;;; From Dahlberg and Maliniak 2009 JCTC paper. Note atom types are for Martini v1.4 not v2. Also fixed JG's incorrect angle and upper glycerol atom type. TJP 2010
+
+[ moleculetype ]
+; molname       nrexcl
+CARD                1
+
+[ atoms ]
+;id type resnr residu atom cgnr   charge
+ 1   Nda  1     CARD     GL0    1      0    
+ 2   Qa   1     CARD     PO1    2     -1.0    
+ 3   Na   1     CARD     GL1    3      0    
+ 4   Na   1     CARD     GL2    4      0    
+ 5   C1   1     CARD     C1A    5      0    
+ 6   C1   1     CARD     C2A    6      0    
+ 7   C1   1     CARD     C3A    7      0    
+ 8   C1   1     CARD     C4A    8      0    
+ 9   C1   1     CARD     C1B    9      0    
+ 10  C1   1     CARD     C2B    10     0    
+ 11  C3   1     CARD     D3B    11     0    
+ 12  C1   1     CARD     C4B    12     0    
+ 13  C1   1     CARD     C5B    13     0    
+ 14  Qa   1     CARD     PO2    14    -1.0    
+ 15  Na   1     CARD     GL3    15     0    
+ 16  Na   1     CARD     GL4    16     0    
+ 17  C1   1     CARD     C1C    17     0    
+ 18  C1   1     CARD     C2C    18     0    
+ 19  C1   1     CARD     C3C    19     0    
+ 20  C1   1     CARD     C4C    20     0    
+ 21  C1   1     CARD     C1D    21     0    
+ 22  C1   1     CARD     C2D    22     0    
+ 23  C3   1     CARD     D3D    23     0    
+ 24  C1   1     CARD     C4D    24     0    
+ 25  C1   1     CARD     C5D    25     0   
+
+
+[bonds]
+;  i     j   funct   length  force.c.
+   1     2    1       0.38     5500
+   2     3    1       0.47     1250
+   3     4    1       0.47     1250
+   4     5    1       0.47     1250
+   5     6    1       0.47     1250
+   6     7    1       0.47     1250
+   7     8    1       0.47     1250
+   3     9    1       0.47     1250
+   9     10   1       0.47     1250
+   10    11   1       0.47     1250
+   11    12   1       0.47     1250
+   12    13   1       0.47     1250
+   1     14   1       0.38     5500
+   14    15   1       0.47     1250
+   15    16   1       0.47     1250
+   16    17   1       0.47     1250
+   17    18   1       0.47     1250
+   18    19   1       0.47     1250
+   19    20   1       0.47     1250
+   15    21   1       0.47     1250
+   21    22   1       0.47     1250
+   22    23   1       0.47     1250
+   23    24   1       0.47     1250
+   24    25   1       0.47     1250
+
+
+[angles]
+;  i     j    k     funct   angle  force.c.
+   2     3    4       2   120.000  25.0 
+   2     3    9       2   180.000  25.0 
+   4     5    6       2   180.000  25.0 
+   5     6    7       2   180.000  25.0 
+   6     7    8       2   180.000  25.0 
+   3     9   10       2   180.000  25.0 
+   9    10   11       2   180.000  25.0 
+  10    11   12       2   120.000  35.0 
+  11    12   13       2   180.000  25.0 
+   2     1   14       2   105.000  45.0
+   1     2    3       2   110.000  25.0 
+   1    14   15       2   110.000  25.0 
+  14    15   16       2   120.000  25.0 
+  14    15   21       2   180.000  25.0 
+  16    17   18       2   180.000  25.0 
+  17    18   19       2   180.000  25.0 
+  18    19   20       2   180.000  25.0 
+  15    21   22       2   180.000  25.0 
+  21    22   23       2   180.000  25.0 
+  22    23   24       2   120.000  35.0 
+  23    24   25       2   180.000  25.0 
+
+;;;;;; DIACYLGLYCEROL
+
+[moleculetype]
+; molname 	nrexcl
+  DAG 1
+
+[atoms]
+; id 	type 	resnr 	residu 	atom 	cgnr 	charge
+  1 	SP1 	1  	DAG  	DOH 	1 	0 
+  2 	Na 	1  	DAG  	GL1 	2 	0 
+  3 	Na 	1  	DAG  	GL2 	3 	0 
+  4 	C1 	1  	DAG  	C1A 	4 	0 
+  5 	C1 	1  	DAG  	C2A 	5 	0 
+  6 	C1 	1  	DAG  	C3A 	6 	0 
+  7 	C1 	1  	DAG  	C4A 	7 	0 
+  8 	C1 	1  	DAG  	C1B 	8 	0 
+  9 	C1 	1  	DAG  	C2B 	9 	0 
+  10 	C3 	1  	DAG  	D3B 	10 	0 
+  11 	C1 	1  	DAG  	C4B 	11 	0 
+  12 	C1 	1  	DAG  	C5B 	12 	0 
+
+[bonds]
+; i j 	funct 	length 	force.c.
+  1 2 	1 	0.37 	1250
+  2 3 	1 	0.37 	1250
+  3 4 	1 	0.47 	1250
+  4 5 	1 	0.47 	1250
+  5 6 	1 	0.47 	1250
+  6 7 	1 	0.47 	1250
+  2 8 	1 	0.47 	1250
+  8 9 	1 	0.47 	1250
+  9 10 1 	0.47 	1250
+  10 11 1 	0.47 	1250
+  11 12 1 	0.47 	1250
+
+[angles]
+; i j k 	funct 	angle 	force.c.
+  1 2 3 	2 	120.0 	25.0 
+  1 2 8 	2 	180.0 	25.0 
+  3 4 5 	2 	180.0 	25.0 
+  4 5 6 	2 	180.0 	25.0 
+  5 6 7 	2 	180.0 	25.0 
+  2 8 9 	2 	180.0 	25.0 
+  8 9 10 	2 	180.0 	25.0 
+  9 10 11 	2 	120.0 	45.0 
+  10 11 12 	2 	180.0 	25.0 
+
+;;;;;; MONOACYLGLYCEROL
+
+[moleculetype]
+; molname 	nrexcl
+  MAG 1
+
+[atoms]
+; id 	type 	resnr 	residu 	atom 	cgnr 	charge
+  1 	Nda 	1  	MAG  	DOH 	1 	0 
+  2 	Na 	1  	MAG  	GL1 	2 	0 
+  3 	C1 	1  	MAG  	C1A 	3 	0 
+  4 	C1 	1  	MAG  	C2A 	4 	0 
+  5 	C3 	1  	MAG  	C3A 	5 	0 
+  6 	C1 	1  	MAG  	C4A 	6 	0 
+  7 	C1 	1  	MAG  	C5A 	7 	0 
+
+[bonds]
+; i j 	funct 	length 	force.c.
+  1 2 	1 	0.37 	1250
+  2 3 	1 	0.47 	1250
+  3 4 	1 	0.47 	1250
+  4 5 	1 	0.47 	1250
+  5 6 	1 	0.47 	1250
+  6 7 	1 	0.47 	1250
+
+[angles]
+; i j k 	funct 	angle 	force.c.
+  1 2 3 	2 	180.0 	25.0 
+  2 3 4 	2 	180.0 	25.0 
+  3 4 5 	2 	180.0 	25.0 
+  4 5 6 	2 	120.0 	45.0 
+  5 6 7 	2 	180.0 	25.0 
+
+;;;;;; LYSO-OLEOYL-PHOSPHATIDIC ACID
+
+[moleculetype]
+; molname 	nrexcl
+LOPA 1
+
+[atoms]
+; id 	type 	resnr 	residu 	atom 	cgnr 	charge
+  1 	Qa 	1 	LOPA 	PO3 	1 	-2.0
+  2 	Na 	1  	LOPA 	GL1 	2 	0 
+  3 	C1 	1  	LOPA 	C1A 	3 	0 
+  4 	C1 	1  	LOPA 	C2A 	4 	0 
+  5 	C3 	1  	LOPA 	C3A 	5 	0 
+  6 	C1 	1  	LOPA 	C4A 	6 	0 
+  7 	C1 	1  	LOPA 	C5A 	7 	0 
+
+[bonds]
+; i j 	funct 	length 	force.c.
+  1 2 	1 	0.37 	1250
+  2 3 	1 	0.47 	1250
+  3 4 	1 	0.47 	1250
+  4 5 	1 	0.47 	1250
+  5 6 	1 	0.47 	1250
+  6 7 	1 	0.47 	1250
+
+[angles]
+; i j k 	funct 	angle 	force.c.
+  1 2 3 	2 	180.0 	25.0 
+  2 3 4 	2 	180.0 	25.0 
+  3 4 5 	2 	180.0 	25.0 
+  4 5 6 	2 	120.0 	45.0 
+  5 6 7 	2 	180.0 	25.0 
+
+[moleculetype]
+; molname 	nrexcl
+  SQD  		1
+
+[atoms]
+; id 	type 	resnr 	residu 	atom 	cgnr 	charge
+  1     P1      1       SQD      B1     1       0
+  2     P4      1       SQD      B2     2       0
+  3     P4      1       SQD      B3     3       0
+  4 	Na 	1 	SQD  	GL1 	4 	0 
+  5 	Na 	1 	SQD  	GL2 	5 	0 
+  6 	C1 	1 	SQD  	C1A 	6 	0 
+  7 	C1 	1 	SQD  	C2A 	7 	0 
+  8 	C1 	1 	SQD  	C3A 	8 	0 
+  9 	C1 	1 	SQD  	C4A 	9 	0 
+  10 	C1 	1 	SQD  	C1B 	10 	0 
+  11 	C1 	1 	SQD  	C2B 	11 	0 
+  12 	C1 	1 	SQD  	C3B 	12 	0	 
+  13 	C1 	1 	SQD  	C4B 	13 	0    
+  14    Na      1       SQD      S1     14      0
+
+[bonds]
+; i j 	funct 	length 	force.c.
+  1 2 	1	0.375	35000
+  1 3 	1	0.331	35000
+  2 3 	1	0.322	35000
+  2 4   1       0.47    1250
+  4 5 	1 	0.37 	1250
+  4 6 	1 	0.47 	1250
+  6 7 	1 	0.47 	1250
+  7 8 	1 	0.47 	1250
+  8 9 	1 	0.47 	1250
+  5 10  1 	0.47 	1250
+  10 11 1 	0.47 	1250
+  11 12 1 	0.47 	1250
+  12 13 1 	0.47 	1250
+  1  14 1       0.30    5000
+   
+[angles]
+; i j k 	funct 	angle 	force.c  
+  1 2 4     	2 	120.0 	25.0 
+  3 2 4     	2 	120.0 	25.0 
+  2 4 5     	2 	120.0 	25.0 
+  2 4 6		2 	180.0 	25.0 
+  4 6 7 	2 	180.0 	25.0 
+  6 7 8 	2 	180.0 	25.0 
+  7 8 9 	2 	180.0 	25.0  
+  5 10 11 	2 	180.0 	25.0
+  10 11 12 	2 	180.0 	25.0 
+  11 12 13 	2 	180.0 	25.0 
+  14 1 4        2       180.0   45.0
+  14 2 4        2       180.0   45.0
+
+[ dihedrals ]
+; i j k l   funct   angle  forcec.  multiplic.
+  2 3 1 4   2        0.0   50 		; imp
+  
+[moleculetype]
+; molname 	nrexcl
+  LMG  		1
+
+[atoms]
+; id 	type 	resnr 	residu 	atom 	cgnr 	charge
+  1     P1      1       LMG      B1     1       0
+  2     P4      1       LMG      B2     2       0
+  3     P4      1       LMG      B3     3       0
+  4 	Na 	1 	LMG  	GL1 	4 	0 
+  5 	Na 	1 	LMG  	GL2 	5 	0 
+  6 	C1 	1 	LMG  	C1A 	6 	0 
+  7 	C1 	1 	LMG  	C2A 	7 	0 
+  8 	C1 	1 	LMG  	C3A 	8 	0 
+  9 	C1 	1 	LMG  	C4A 	9 	0 
+  10 	C1 	1 	LMG  	C1B 	10 	0 
+  11 	C1 	1 	LMG  	C2B 	11 	0 
+  12 	C1 	1 	LMG  	C3B 	12 	0	 
+  13 	C1 	1 	LMG  	C4B 	13 	0 
+
+[bonds]
+; i j 	funct 	length 	force.c.
+  1 2 	1	0.375	35000
+  1 3 	1	0.331	35000
+  2 3 	1	0.322	35000
+  2 4   1       0.47    1250
+  4 5 	1 	0.37 	1250
+  4 6 	1 	0.47 	1250
+  6 7 	1 	0.47 	1250
+  7 8 	1 	0.47 	1250
+  8 9 	1 	0.47 	1250
+  5 10  1 	0.47 	1250
+  10 11	1 	0.47 	1250
+  11 12 1 	0.47 	1250
+  12 13 1 	0.47 	1250
+  
+[angles]
+; i j k 	funct 	angle 	force.c  
+  1 2 4     	2 	120.0 	25.0 
+  3 2 4     	2 	120.0 	25.0 
+  2 4 5     	2 	120.0 	25.0 
+  2 4 6		2 	180.0 	25.0 
+  4 6 7 	2 	180.0 	25.0 
+  6 7 8 	2 	180.0 	25.0 
+  7 8 9 	2 	180.0 	25.0  
+  5 10 11 	2 	180.0 	25.0
+  10 11 12 	2 	180.0 	25.0 
+  11 12 13 	2 	180.0 	25.0 
+
+[ dihedrals ]
+; i j k l   funct   angle  forcec.  multiplic.
+  2 3 1 4   2        0.0   50 		; imp
+
+[moleculetype]
+; molname 	nrexcl
+  DGD  		1
+
+[atoms]
+; id 	type 	resnr 	residu 	atom 	cgnr 	charge
+  1     P1      1       DGD      B1     1       0
+  2     P4      1       DGD      B2     2       0
+  3     P4      1       DGD      B3     3       0
+  4 	Na 	1 	DGD  	GL1 	4 	0 
+  5 	Na 	1 	DGD  	GL2 	5 	0 
+  6 	C1 	1 	DGD  	C1A 	6 	0 
+  7 	C1 	1 	DGD  	C2A 	7 	0 
+  8 	C1 	1 	DGD  	C3A 	8 	0 
+  9 	C1 	1 	DGD  	C4A 	9 	0 
+  10 	C1 	1 	DGD  	C1B 	10 	0 
+  11 	C1 	1 	DGD  	C2B 	11 	0 
+  12 	C1 	1 	DGD  	C3B 	12 	0	 
+  13 	C1 	1 	DGD  	C4B 	13 	0 
+  14    P4      1       DGD      B4     14      0
+  15    P4      1       DGD      B5     15      0
+  16    P1      1       DGD      B6     16      0
+
+
+[bonds]
+; i j 	funct 	length 	force.c.
+  1 2 	1	0.375	35000
+  1 3 	1	0.331	35000
+  2 3 	1	0.322	35000
+  2 4   1       0.47    1250
+  4 5 	1 	0.37 	1250
+  4 6 	1 	0.47 	1250
+  6 7 	1 	0.47 	1250
+  7 8 	1 	0.47 	1250
+  8 9 	1 	0.47 	1250
+  5 10  1 	0.47 	1250
+  10 11 1 	0.47 	1250
+  11 12 1 	0.47 	1250
+  12 13 1 	0.47 	1250  
+  1  14 1       0.30    5000  
+  14 15 1	0.375	35000
+  14 16	1	0.331	35000
+  15 16	1	0.322	35000 
+  2  15	1	0.55	1000
+   
+[angles]
+; i j k 	funct 	angle 	force.c  
+  1 2 4     	2 	120.0 	25.0 
+  3 2 4     	2 	120.0 	25.0 
+  2 4 5     	2 	120.0 	25.0 
+  2 4 6		2 	180.0 	25.0 
+  4 6 7 	2 	180.0 	25.0 
+  6 7 8 	2 	180.0 	25.0 
+  7 8 9 	2 	180.0 	25.0 
+  5 10 11 	2 	180.0 	25.0 
+  10 11 12 	2 	180.0 	25.0 
+  11 12 13 	2 	180.0 	25.0 
+  14 1 4        2       180.0   45.0
+  14 2 4        2       180.0   45.0
+
+[ dihedrals ]
+; i j k l   funct   angle  forcec.  multiplic.
+ 2 3  1  4   2        0.0   50 		; imp  
+14 1 15 16   2        0.0   50 		; imp
+
+
+[moleculetype]
+; molname 	nrexcl
+  DSPG 		1
+
+[atoms]
+; id 	type 	resnr 	residu 	atom 	cgnr 	charge
+  1 	Nda 	1 	DSPG 	GLH 	1 	0 
+  2 	Qa 	1 	DSPG  	PO4 	2 	-1.0 
+  3 	Na 	1 	DSPG 	GL1 	3 	0 
+  4 	Na 	1 	DSPG 	GL2 	4 	0 
+  5 	C1 	1 	DSPG 	C1A 	5 	0 
+  6 	C1 	1 	DSPG 	C2A 	6 	0 
+  7 	C1 	1 	DSPG 	C3A 	7 	0 
+  8 	C1 	1 	DSPG 	C4A 	8 	0 
+  9 	C1 	1 	DSPG 	C5A 	9 	0 
+  10 	C1 	1 	DSPG 	C1B 	10 	0 
+  11 	C1 	1 	DSPG 	C2B 	11 	0 
+  12 	C1 	1 	DSPG 	C3B 	12 	0	 
+  13 	C1 	1 	DSPG 	C4B 	13 	0 
+  14 	C1 	1 	DSPG 	C5B 	14 	0 
+
+[bonds]
+; i j 	funct 	length 	force.c.
+  1 2 	1 	0.47 	1250
+  2 3 	1 	0.47 	1250
+  3 4 	1 	0.37 	1250
+  3 5 	1 	0.47 	1250
+  5 6 	1 	0.47 	1250
+  6 7 	1 	0.47 	1250
+  7 8 	1 	0.47 	1250
+  8 9 	1 	0.47 	1250
+  4 10 	1 	0.47 	1250
+  10 11 1 	0.47 	1250
+  11 12 1 	0.47 	1250
+  12 13 1 	0.47 	1250
+  13 14 1 	0.47 	1250
+
+[angles]
+; i j k 	funct 	angle 	force.c.
+  2 3 4 	2 	120.0 	25.0 
+  2 3 5 	2 	180.0 	25.0 
+  3 5 6 	2 	180.0 	25.0 
+  5 6 7 	2 	180.0 	25.0 
+  6 7 8 	2 	180.0 	25.0 
+  7 8 9 	2 	180.0 	25.0 
+  4 10 11 	2 	180.0 	25.0 
+  10 11 12 	2 	180.0 	25.0 
+  11 12 13 	2 	180.0 	25.0 
+  12 13 14 	2 	180.0 	25.0 
+
+
+;;; IONS
+;
+; note, ions are not to be taken too seriously using a CG presentation.
+; long range electrostatic interactions are absent, and for small ions
+; the first hydration shell is considered an implicit part of the CG ion. 
+
+;;;;;; HYDRATED SODIUM ION
+;
+; same particle type would represent HYDRATED POTASSIUM
+
+[moleculetype]
+; molname 	nrexcl
+  NA+ 		1
+
+[atoms]
+;id 	type 	resnr 	residu 	atom 	cgnr 	charge
+ 1 	Qd 	1 	ION 	NA+ 	1 	1.0 
+
+
+;;;;;; HYDRATED CHLORIDE ION
+
+[moleculetype]
+; molname 	nrexcl
+  CL- 		1
+
+[atoms]
+;id 	type 	resnr 	residu 	atom 	cgnr 	charge
+ 1 	Qa 	1 	ION 	CL- 	1 	-1.0 
+
+
+;;;;;; CHOLINE ION 
+
+[moleculetype]
+; molname 	nrexcl
+  NC3+ 		1
+
+[atoms]
+;id 	type 	resnr 	residu 	atom 	cgnr 	charge
+ 1 	Q0 	1 	ION 	NC3 	1 	1.0 
+
+
+;;;;;; HYDRATED CALCIUM ION 
+
+[moleculetype]
+; molname 	nrexcl
+  CA+ 		1
+
+[atoms]
+;id 	type 	resnr 	residu 	atom 	cgnr 	charge
+ 1 	Qd 	1 	ION 	CA+ 	1 	2.0 
+
+
+

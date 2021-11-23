@@ -1,0 +1,24 @@
+;
+; Topology file for a membrane simulation with proteins
+; Martin Voegele, MPIBP Frankfurt, 2017-02-08
+;
+
+; Include topology files for ...
+
+; particle definitions, interaction matrix, plus the topology for water.
+#include "../../../newmartini/martini_v2.1.itp"
+
+; ions
+#include "../../../newmartini/martini_v2.0_ions.itp"
+
+; lipids
+#include "../../../newmartini/martini_v2.0_lipids_all_201506.itp"
+
+; restrained lipids
+#include "restrained-lipids.itp"
+
+; amino acids
+#include "../../../newmartini/martini_v2.1_aminoacids.itp"
+
+; protein
+#include "protein.itp"

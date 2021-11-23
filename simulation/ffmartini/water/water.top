@@ -1,0 +1,10 @@
+#include "martini_v2.0.itp"
+
+[ system ]
+; name
+WATER 
+
+[ molecules ]
+; name  number
+W 400
+

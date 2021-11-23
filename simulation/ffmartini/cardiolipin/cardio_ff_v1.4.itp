@@ -1,0 +1,90 @@
+: FORCEFIELD V1.4 
+
+;;;;;; DI-[1-PALMITOYL-2-OLEOYL-PHOSPHATIDYL-GLYCEROL] (most abundant Cardiolipin in E. coli membranes, well cis-vaccenate not oleate but they are the same in Martini)
+;;;;;; From Dahlberg and Maliniak 2009 JCTC paper. Note atom types are for Martini v1.4 not v2.
+
+[ moleculetype ]
+; molname       nrexcl
+CARD                1
+
+[ atoms ]
+;id type resnr residu atom cgnr   charge
+ 1   Nda  1     CARD     GL0    1      0    
+ 2   Qa   1     CARD     PO1    2     -1.0    
+ 3   Na   1     CARD     GL1    3      0    
+ 4   Na   1     CARD     GL2    4      0    
+ 5   C    1     CARD     C1A    5      0    
+ 6   C    1     CARD     C2A    6      0    
+ 7   C    1     CARD     C3A    7      0    
+ 8   C    1     CARD     C4A    8      0    
+ 9   C    1     CARD     C1B    9      0    
+ 10  C    1     CARD     C2B    10     0    
+ 11  C    1     CARD     D3B    11     0    
+ 12  C    1     CARD     C4B    12     0    
+ 13  C    1     CARD     C5B    13     0    
+ 14  Qa   1     CARD     PO2    14    -1.0    
+ 15  Na   1     CARD     GL3    15     0    
+ 16  Na   1     CARD     GL4    16     0    
+ 17  C    1     CARD     C1C    17     0    
+ 18  C    1     CARD     C2C    18     0    
+ 19  C    1     CARD     C3C    19     0    
+ 20  C    1     CARD     C4C    20     0    
+ 21  C    1     CARD     C1D    21     0    
+ 22  C    1     CARD     C2D    22     0    
+ 23  C    1     CARD     D3D    23     0    
+ 24  C    1     CARD     C4D    24     0    
+ 25  C    1     CARD     C5D    25     0   
+
+
+[bonds]
+;  i     j   funct   length  force.c.
+   1     2    1       0.38     5500
+   2     3    1       0.47     1250
+   3     4    1       0.47     1250
+   4     5    1       0.47     1250
+   5     6    1       0.47     1250
+   6     7    1       0.47     1250
+   7     8    1       0.47     1250
+   3     9    1       0.47     1250
+   9     10   1       0.47     1250
+   10    11   1       0.47     1250
+   11    12   1       0.47     1250
+   12    13   1       0.47     1250
+   1     14   1       0.38     5500
+   14    15   1       0.47     1250
+   15    16   1       0.47     1250
+   16    17   1       0.47     1250
+   17    18   1       0.47     1250
+   18    19   1       0.47     1250
+   19    20   1       0.47     1250
+   15    21   1       0.47     1250
+   21    22   1       0.47     1250
+   22    23   1       0.47     1250
+   23    24   1       0.47     1250
+   24    25   1       0.47     1250
+
+
+[angles]
+;  i     j    k     funct   angle  force.c.
+   2     3    4       2   120.000  25.0 
+   2     3    9       2   180.000  25.0 
+   4     5    6       2   180.000  25.0 
+   5     6    7       2   180.000  25.0 
+   6     7    8       2   180.000  25.0 
+   3     9   10       2   180.000  25.0 
+   9    10   11       2   180.000  25.0 
+  10    11   12       2   120.000  35.0 
+  11    12   13       2   180.000  25.0 
+   2     1   14       2   105.000  45.0
+   1     2    3       2   110.000  25.0 
+   1    14   15       2   110.000  25.0 
+  14    15   16       2   120.000  25.0 
+  14    15   21       2   180.000  25.0 
+  16    17   18       2   180.000  25.0 
+  17    18   19       2   180.000  25.0 
+  18    19   20       2   180.000  25.0 
+  15    21   22       2   180.000  25.0 
+  21    22   23       2   180.000  25.0 
+  22    23   24       2   120.000  35.0 
+  23    24   25       2   180.000  25.0 
+

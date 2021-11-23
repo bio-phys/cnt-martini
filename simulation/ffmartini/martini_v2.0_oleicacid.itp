@@ -1,0 +1,39 @@
+;;;;;;;; TOPOLOGY FOR OLEIC ACID ;;;;;;;;;
+;                                        ;
+;   Martin Voegele, ICP, Uni Stuttgart   ;
+;                                        ;
+;      - last updated 2014-07-23 -       ;
+;                                        ;
+
+
+; topology file for oleate carboxylic acid
+; P4 bead as in PCA (palmitic carboxylic acid)
+; Carbon tail as in CO (cholesteryl oleate)
+
+
+[moleculetype]
+; molname 	nrexcl
+  OCA  1
+
+[atoms]
+; id 	type 	resnr 	residu 	atom 	cgnr 	charge
+  1 	P4 	1  	OCA  	COO 	1 	0 
+  2 	C1 	1  	OCA 	C1 	2 	0 
+  3 	C3 	1  	OCA 	C2 	3 	0 
+  4 	C1 	1  	OCA 	C3 	4 	0 
+  5 	C1 	1  	OCA 	C4 	5 	0 
+
+[bonds]
+; i j 	funct 	length 	force.c.
+  1 2 	1 	0.47 	1250
+  2 3   1 	0.47 	1250
+  3 4   1 	0.47 	1250
+  4 5   1 	0.47 	1250
+
+[angles]
+; i j k 	funct 	angle 	force.c.
+  1 2 3 	2 	180.0 	25.0 
+  2 3 4 	2 	120.0 	45.0 
+  3 4 5 	2 	180.0 	25.0 
+
+

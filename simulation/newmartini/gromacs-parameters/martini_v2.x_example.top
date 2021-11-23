@@ -1,0 +1,29 @@
+;
+; Example topology file for MARTINI 2.0
+;
+
+; First include the file containing all particle definitions,
+; the interaction matrix, plus the topology for water.
+
+#include "martini_v2.0.itp"
+
+; Then include the file(s) containing the topologies of other
+; molecules present in your system.
+
+#include "martini_v2.0_lipids.itp"
+#include "martini_v2.0_salt.itp"
+
+; Define a name for your system
+
+[ system ]
+DPPC BILAYER + SALT 
+
+; Define the composition of your system
+; The molecule names should correspond to those defined in the itp file(s).
+
+[ molecules ]
+DPPC 128
+W 2000
+NA+ 20
+CL- 20
+

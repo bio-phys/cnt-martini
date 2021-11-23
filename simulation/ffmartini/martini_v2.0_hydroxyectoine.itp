@@ -1,0 +1,41 @@
+;;;;;; TOPOLOGY FOR HYDROXYECTOINE ;;;;;;;
+;                                        ;
+;   Martin Voegele, ICP, Uni Stuttgart   ;
+;                                        ;
+;               MODEL E04                ;
+;                                        ;
+;      - last updated 2014-08-26 -       ;
+;                                        ;
+
+
+
+[moleculetype]
+; molname       nrexcl
+  HECT 		2
+
+[atoms]
+; id    type    resnr   residu  atom    cgnr    charge
+  1 	Qa 	1 	HECT 	COO 	1 	-1 
+  2 	SP1 	1 	HECT 	NH1 	1 	0 
+  3 	SQd 	1 	HECT 	NH2 	1 	1 
+  4 	SP1 	1 	HECT 	OH 	1 	0 
+
+
+[constraints]
+; i j   funct   length
+  2 3 	1 	0.24
+  2 4 	1 	0.24
+  3 4 	1 	0.24
+
+
+[bonds]
+; i j   funct   length  force.c.
+  1 2	1	0.24	8000
+  1 4	1	0.24	8000
+
+
+[dihedrals]
+; i j k l 	funct  	q0 	cq
+  3 4 2 1	2	135	167.36
+
+

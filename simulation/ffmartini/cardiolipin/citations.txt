@@ -1,0 +1,77 @@
+=====================================
+Force field parameters from Lipidbook
+=====================================
+
+Parameter files in this zip file were downloaded from lipidbook.bioch.ox.ac.uk.
+Linked parameters need to be manually downloaded via the links in links.txt.
+
+Always cite the primary reference(s) for the parameters, which can be
+found at the end of this file.
+
+Please cite Lipidbook in your published work with the reference
+
+J. Domanski, P. Stansfeld, M.S.P. Sansom, and O. Beckstein. 
+Lipidbook: A Public Repository for Force Field Parameters Used in Membrane 
+Simulations. J. Membrane Biol. 236 (2010), 255--258. doi:10.1007/s00232-010-9296-8. 
+URL:http://lipidbook.bioch.ox.ac.uk
+
+ 
+
+License: Fair Use (http://www.copyrightservice.co.uk/copyright/p09_fair_use) 
+ NOTE: The licence REQUIRES that you cite the primary reference when
+       you use and/or modify these files.  See the link under Licence for
+       details.
+ 
+
+Overview
+========
+Lipid:         cardiolipin (DPG)
+Forcefield:    Martini
+Code:          Gromacs
+Version:       5 (created: 23-06-2010, last update: 23-06-2010)
+Curator:       Joseph Goose
+Lipidbook URL: http://lipidbook.bioch.ox.ac.uk/version/show/id/51.html
+ 
+File manifest
+=============
+Downloaded files are listed with SHA1 checksums. You can compute the
+checksums of the downloaded files (e.g. with the 'openssl sha1' or
+the 'sha1sum' commands) and compare them to the listed ones. If they
+agree you have verified the files; it also allows a simple check of
+which files changed between versions.
+ 
+card.gro                  : 6130310040c5368e0bdf3ee37c791dfbb7078547
+card.pdb                  : 459308b406cecce9bc509c7c2d49f9fc995bfdf9
+cardio_ff_v1.4.itp        : 75a3ac862af2f14bffb3cb06b7f544b870c6249b
+SHA1 of all files         : 6f33b2dbebfb2a25ca255a19bd3e93622a7fcb6d
+
+Primary reference(s)
+===================
+Please always credit the original authors of the parameters by citing 
+these papers:
+ 
+
+Title:     Mechanical Properties of Coarse-Grained Bilayers Formed by Cardiolipin and Zwitterionic Lipids
+Authors:   Martin Dahlberg and Arnold Maliniak 
+Journal:   JCTC  
+Year:      2010
+Volume:    http://pubs.acs.org/doi/abs/10.1021/ct900654e
+Page:      1638
+pubmed id: 
+doi:       10.1021/ct900654e
+
+Additional notes:  
+           -
+
+Title:     Supp. Info.: Mechanical Properties of Coarse-Grained Bilayers Formed by Cardiolipin and Zwitterionic Lipids 
+Authors:   Martin Dahlberg and Arnold Maliniak 
+Journal:   JCTC  
+Year:      2010
+Volume:    http://pubs.acs.org/doi/suppl/10.1021/ct900654e
+Page:      -
+pubmed id: 
+doi:       
+
+Additional notes:  
+           -
+

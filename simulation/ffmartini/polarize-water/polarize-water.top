@@ -1,0 +1,7 @@
+#include "martini_v2.P.itp"
+
+[ system ]
+POLARIZABLE WATER
+
+[ molecules ]
+PW   1824

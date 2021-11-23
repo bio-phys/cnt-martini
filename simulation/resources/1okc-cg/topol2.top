@@ -1,0 +1,13 @@
+#include "martini_v2.1.itp"
+#include "protein-cg.itp"
+
+[ system ]
+SELF-ASSEMBLY
+
+[ molecules ]
+PROTEIN 1
+
+DPPC 268
+W 9265818
+NA+ 126
+CL- 143
