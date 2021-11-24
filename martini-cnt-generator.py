@@ -18,6 +18,8 @@ parser.add_argument( "-ft", "--functype",   type=str,   default='SNda', help='Ty
 parser.add_argument( "-fb", "--numfuncb",   type=int,   default=1,      help='Number of funct. bead rings at the beginning'        )
 parser.add_argument( "-fe", "--numfunce",   type=int,   default=1,      help='Number of funct. bead rings at the end'              )
 parser.add_argument( "-fn", "--filename",   type=str,   default=None,   help='Name of the output, default: generate automatically' )
+parser.add_argument( "--base36", dest='base36', action='store_true',    help='Use numbers in base 36 (with letters) to name atoms' )
+parser.set_defaults(base36=False)
 args = parser.parse_args()
 
 
@@ -30,6 +32,20 @@ numfunce = args.numfunce
 a        = args.bondlength
 kf_bonds = args.bondforce
 kf_angle = args.angleforce
+
+
+
+### --- Function Definitions --- ###
+
+def b36_encode(i):
+    digits = "0123456789abcdefghijklmnopqrstuvwxyz"
+    if i < 0: return "-" + b36_encode(-i)
+    if i < 36: return digits[i]
+    return b36_encode(i // 36) + b36_encode(i % 36) 
+    
+    
+
+### --- MAIN --- ###
 
 
 if args.filename == None:
@@ -78,10 +94,16 @@ for i in range(0, numrings):
 		x = R*sin(p)
 		y = R*cos(p)
 		z = i*a*sqrt(3)/2
-		if ( i < numfuncb or i >= numrings-numfunce):
-			structure_file.write(  "%5d%-5s F%03d%5d%8.3f%8.3f%8.3f%8.4f%8.4f%8.4f\n" % (1, "  CNT", n%1000, n%100000, x, y, z, 0, 0, 0) )
+		# Atom names are just numbered (base 10 or base 36)
+		if args.base36:
+			atomname = b36_encode(n%(36**3)).zfill(3)
 		else:
-			structure_file.write(  "%5d%-5s C%03d%5d%8.3f%8.3f%8.3f%8.4f%8.4f%8.4f\n" % (1, "  CNT", n%1000, n%100000, x, y, z, 0, 0, 0) )
+			atomname = "%03d"%(n%1000)
+		# Write atom information
+		if ( i < numfuncb or i >= numrings-numfunce):
+			structure_file.write(  "%5d%-5s F%s%5d%8.3f%8.3f%8.3f%8.4f%8.4f%8.4f\n" % (1, "  CNT", atomname, n%100000, x, y, z, 0, 0, 0) )
+		else:
+			structure_file.write(  "%5d%-5s C%s%5d%8.3f%8.3f%8.3f%8.4f%8.4f%8.4f\n" % (1, "  CNT", atomname, n%100000, x, y, z, 0, 0, 0) )
 
 
 # Box Dimensions
@@ -133,10 +155,16 @@ topology_file.write( "; nr	 type	 resnr	 residue	 atom	 cgnr	 charge	 mass\n" )
 for m in range(0, numrings):
 	for n in range(1, ringsize+1):
 		i = m*ringsize + n
-		if ( m < numfuncb or m >= numrings-numfunce):
-			topology_file.write( "%3d    %4s   1   CNT    F%03d     %3d       0      48\n" % (i, functype, i%1000, i%1000) )
+		# Atom names are just numbered (base 10 or base 36)
+		if args.base36:
+			atomname = b36_encode(i%(36**3)).zfill(3)
 		else:
-			topology_file.write( "%3d    %4s   1   CNT    C%03d     %3d       0      48\n" % (i, beadtype, i%1000, i%1000) )
+			atomname = "%03d"%(i%1000)
+		# Write atom information
+		if ( m < numfuncb or m >= numrings-numfunce):
+			topology_file.write( "%3d    %4s   1   CNT    F%s     %3d       0      48\n" % (i, functype, atomname, i%1000) )
+		else:
+			topology_file.write( "%3d    %4s   1   CNT    C%s     %3d       0      48\n" % (i, beadtype, atomname, i%1000) )
 
 
 # Bonds
