@@ -13,7 +13,16 @@ Python (2/3) with packages argparse, math, and sys
 
 For a new nanotube model, run 
 
-    python martini-cnt-generator.py -nr [number of rings] -rs [number of beads per ring] -bl [bond length] -bf [bond force const.] -af [angle force const.] -bt [bead type] -ft [bead type of the functional groups] -fb [number of functionalized rings at one end] -fe [number of functionalized rings at the other end] {--base36}
+    python martini-cnt-generator.py -nr [number of rings] \
+                                    -rs [number of beads per ring] \
+                                    -bl [bond length] \
+                                    -bf [bond force const.] \
+                                    -af [angle force const.] \
+                                    -bt [bead type] \
+                                    -ft [bead type of the functional groups] \
+                                    -fb [number of functionalized rings at one end] \
+                                    -fe [number of functionalized rings at the other end] \
+                                    --base36
 
 for example
 
@@ -21,10 +30,9 @@ for example
 
 All arguments are optional. If an argument is not used, the default value for the standard CNT porin [1] is used.
 
-By default, atom names are a letter denoting their function (C - plain carbon grid, F - funcional group) plus the last three digits of their atom number (decimal system). The option --base36 uses a base of 36 (including letters) to expand the number of unique atom names from 1000 (decimal) to 36^3=46656.
-
 ## Notes
 
+* By default, atom names are a letter denoting their function (C - plain carbon grid, F - funcional group) plus the last three digits of their atom number (decimal system). The flag `--base36` switches to a base of 36 (including letters) to expand the number of unique atom names from 10^3 = 1000 (decimal) to 36^3 = 46656.
 * For large CNTs, a higher force constant than the standard value of 5000 should be used. A rule of thumb is to use a value of 20000 if the circumference exceeds 10 beads/ring or the length exceeds 15 rings. 
 * The script produces position restraints, too. These are usually inteded for equilibration. They will not work with a Parrinello-Rahman barostat. 
 
