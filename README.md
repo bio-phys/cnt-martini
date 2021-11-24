@@ -13,13 +13,15 @@ Python (2/3) with packages argparse, math, and sys
 
 For a new nanotube model, run 
 
-    python martini-cnt-generator.py -nr [number of rings] -rs [number of beads per ring] -bl [bond length] -bf [bond force const.] -af [angle force const.] -bt [bead type] -ft [bead type of the functional groups] -fb [number of functionalized rings at one end] -fe [number of functionalized rings at the other end]
+    python martini-cnt-generator.py -nr [number of rings] -rs [number of beads per ring] -bl [bond length] -bf [bond force const.] -af [angle force const.] -bt [bead type] -ft [bead type of the functional groups] -fb [number of functionalized rings at one end] -fe [number of functionalized rings at the other end] {--base36}
 
 for example
 
     python martini-cnt-generator.py -nr 12 -rs 8 -bl 0.47 -bt CNP -ft SNda -fb 1 -fe 1
 
 All arguments are optional. If an argument is not used, the default value for the standard CNT porin [1] is used.
+
+By default, atom names are a letter denoting their function (C - plain carbon grid, F - funcional group) plus the last three digits of their atom number (decimal system). The option --base36 uses a base of 36 (including letters) to expand the number of unique atom names from 1000 (decimal) to 36^3=46656.
 
 ## Notes
 

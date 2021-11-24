@@ -7,8 +7,8 @@ mkdir -p output
 cd output
 
 cp ../parameters/* .
-cp ../../cnt-12-8-a470-CNP-f11-SNda.gro cnt.gro
-cp ../../cnt-12-8-a470-CNP-f11-SNda.itp cnt.itp
+cp ../../nanotubes/cnt-12-8-a470-CNP-f11-SNda.gro cnt.gro
+cp ../../nanotubes/cnt-12-8-a470-CNP-f11-SNda.itp cnt.itp
 
 insane -l POPC:1 -salt 0.15 -x $EDGE -y $EDGE -z $HEIGHT -center -pbc cubic -sol W:9 -sol WF:1 -f cnt.gro -p system.top -o system.gro
 
